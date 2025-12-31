@@ -6,14 +6,6 @@ import L from "leaflet"
 import "leaflet/dist/leaflet.css"
 import { Attraction } from "@/lib/data"
 
-// Fix for default marker icons in Leaflet with Next.js
-delete (L.Icon.Default.prototype as any)._getIconUrl
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
-  iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
-})
-
 interface MapComponentProps {
   attractions: Attraction[]
   selectedAttraction: Attraction | null
@@ -71,6 +63,27 @@ export default function MapComponent({
   hoveredAttractionId,
   onAttractionSelect,
 }: MapComponentProps) {
+
+  useEffect(() => {
+    // Fix for default marker icons in Leaflet with Next.js
+    // This needs to be inside useEffect to run only on client side
+    // and check if prototype modification is needed.
+    // However, since we are using custom icons, the default icon fix might not be strictly necessary
+    // for our markers, but good for fallback.
+
+    // We check if the delete has already happened to avoid errors or re-running logic unnecessarily,
+    // though the delete operator is safe.
+
+    // Using type assertion to access _getIconUrl which is not in the type definition
+    delete (L.Icon.Default.prototype as any)._getIconUrl
+
+    L.Icon.Default.mergeOptions({
+      iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
+      iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
+      shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+    })
+  }, [])
+
   return (
     <>
       <style jsx global>{`

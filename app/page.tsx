@@ -3,10 +3,12 @@
 import { useState } from "react"
 import dynamic from "next/dynamic"
 import { Input } from "@/components/ui/input"
-import { MapPin, Search } from "lucide-react"
+import { MapPin, Search, Menu, X } from "lucide-react"
 import { AttractionCard } from "@/components/attraction-card"
 import { AttractionDetails } from "@/components/attraction-details"
 import { attractions, Attraction } from "@/lib/data"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Button } from "@/components/ui/button"
 
 // Dynamically import MapComponent to avoid SSR issues with Leaflet
 const MapComponent = dynamic(() => import("@/components/map-component"), {
@@ -25,6 +27,7 @@ export default function Page() {
   const [selectedAttraction, setSelectedAttraction] = useState<Attraction | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [hoveredAttractionId, setHoveredAttractionId] = useState<number | null>(null)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const filteredAttractions = attractions.filter(
     (attraction) =>
@@ -34,62 +37,99 @@ export default function Page() {
 
   const handleAttractionSelect = (attraction: Attraction) => {
     setSelectedAttraction(attraction)
+    setIsMobileMenuOpen(false) // Close mobile menu on selection
   }
+
+  const AttractionList = () => (
+    <div className="flex flex-col h-full">
+      <div className="p-6 border-b border-amber-100 flex-shrink-0">
+        <h2 className="text-lg font-light text-gray-900 mb-2">Featured Attractions</h2>
+        <p className="text-sm text-gray-500 font-light">{filteredAttractions.length} remarkable destinations</p>
+      </div>
+
+      <div className="flex-1 overflow-y-auto">
+        <ul className="p-4 space-y-3">
+          {filteredAttractions.map((attraction) => (
+            <li key={attraction.id}>
+              <AttractionCard
+                attraction={attraction}
+                isSelected={selectedAttraction?.id === attraction.id}
+                isHovered={hoveredAttractionId === attraction.id}
+                onClick={handleAttractionSelect}
+                onMouseEnter={() => setHoveredAttractionId(attraction.id)}
+                onMouseLeave={() => setHoveredAttractionId(null)}
+              />
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  )
 
   return (
     <div className="h-screen w-full bg-gradient-to-br from-amber-50 via-white to-orange-50 overflow-hidden flex flex-col">
       {/* Header */}
-      <div className="z-20 bg-white/80 backdrop-blur-xl border-b border-amber-100 flex-shrink-0">
-        <div className="flex items-center justify-between p-6">
+      <header className="z-20 bg-white/80 backdrop-blur-xl border-b border-amber-100 flex-shrink-0">
+        <div className="flex items-center justify-between p-4 md:p-6">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center">
               <MapPin className="w-4 h-4 text-white" />
             </div>
             <div>
               <h1 className="text-xl font-light text-gray-900">Ghana</h1>
-              <p className="text-sm text-gray-500 font-light">Discover extraordinary places</p>
+              <p className="text-xs md:text-sm text-gray-500 font-light hidden sm:block">Discover extraordinary places</p>
             </div>
           </div>
 
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <Input
-              placeholder="Search attractions..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 w-64 bg-white/50 border-amber-200 focus:border-amber-300 focus:ring-amber-200"
-            />
-          </div>
-        </div>
-      </div>
+          <div className="flex items-center gap-2">
+            <div className="relative hidden md:block">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Input
+                placeholder="Search attractions..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 w-64 bg-white/50 border-amber-200 focus:border-amber-300 focus:ring-amber-200"
+              />
+            </div>
 
-      <div className="flex flex-1 overflow-hidden relative">
-        {/* Sidebar */}
-        <div className="w-96 bg-white/90 backdrop-blur-xl border-r border-amber-100 flex flex-col z-10 h-full">
-          <div className="p-6 border-b border-amber-100 flex-shrink-0">
-            <h2 className="text-lg font-light text-gray-900 mb-2">Featured Attractions</h2>
-            <p className="text-sm text-gray-500 font-light">{filteredAttractions.length} remarkable destinations</p>
-          </div>
-
-          <div className="flex-1 overflow-y-auto">
-            <div className="p-4 space-y-3">
-              {filteredAttractions.map((attraction) => (
-                <AttractionCard
-                  key={attraction.id}
-                  attraction={attraction}
-                  isSelected={selectedAttraction?.id === attraction.id}
-                  isHovered={hoveredAttractionId === attraction.id}
-                  onClick={handleAttractionSelect}
-                  onMouseEnter={() => setHoveredAttractionId(attraction.id)}
-                  onMouseLeave={() => setHoveredAttractionId(null)}
+            {/* Mobile Search & Menu */}
+            <div className="md:hidden flex items-center gap-2">
+               {/* Mobile Search could be expanded, for now kept simple or hidden behind menu if space is tight.
+                   Let's keep it visible but smaller or expandable. */}
+               <div className="relative w-40">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Input
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9 h-9 bg-white/50 border-amber-200 focus:border-amber-300 focus:ring-amber-200 text-sm"
                 />
-              ))}
+              </div>
+
+              <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="icon" className="h-9 w-9 border-amber-200 text-amber-900 hover:bg-amber-50">
+                    <Menu className="h-4 w-4" />
+                    <span className="sr-only">Open menu</span>
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="w-[85%] sm:w-[380px] p-0 pt-10">
+                  <AttractionList />
+                </SheetContent>
+              </Sheet>
             </div>
           </div>
         </div>
+      </header>
+
+      <main className="flex flex-1 overflow-hidden relative">
+        {/* Desktop Sidebar */}
+        <aside className="hidden md:flex w-96 bg-white/90 backdrop-blur-xl border-r border-amber-100 flex-col z-10 h-full">
+          <AttractionList />
+        </aside>
 
         {/* Map */}
-        <div className="flex-1 relative h-full">
+        <div className="flex-1 relative h-full w-full">
           <MapComponent
             attractions={attractions}
             selectedAttraction={selectedAttraction}
@@ -105,7 +145,7 @@ export default function Page() {
             />
           )}
         </div>
-      </div>
+      </main>
     </div>
   )
 }
