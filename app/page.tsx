@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import dynamic from "next/dynamic"
 import { Input } from "@/components/ui/input"
 import { MapPin, Search, Menu, X } from "lucide-react"
@@ -29,11 +29,11 @@ export default function Page() {
   const [hoveredAttractionId, setHoveredAttractionId] = useState<number | null>(null)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
-  const filteredAttractions = attractions.filter(
+  const filteredAttractions = useMemo(() => attractions.filter(
     (attraction) =>
       attraction.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       attraction.category.toLowerCase().includes(searchQuery.toLowerCase()),
-  )
+  ), [searchQuery])
 
   const handleAttractionSelect = (attraction: Attraction) => {
     setSelectedAttraction(attraction)
