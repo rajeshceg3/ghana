@@ -122,6 +122,7 @@ export default function MapComponent({
             key={attraction.id}
             position={[attraction.lat, attraction.lng]}
             icon={createCustomIcon(hoveredAttractionId === attraction.id)}
+            title={attraction.name}
             eventHandlers={{
               click: () => onAttractionSelect(attraction),
             }}
