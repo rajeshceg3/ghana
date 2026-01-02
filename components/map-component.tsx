@@ -28,6 +28,26 @@ function MapController({ selectedAttraction }: { selectedAttraction: Attraction 
   return null
 }
 
+function MapResizer() {
+  const map = useMap()
+
+  useEffect(() => {
+    const observer = new ResizeObserver(() => {
+      map.invalidateSize()
+    })
+
+    // We observe the container of the map
+    const container = map.getContainer()
+    observer.observe(container)
+
+    return () => {
+      observer.disconnect()
+    }
+  }, [map])
+
+  return null
+}
+
 const createCustomIcon = (isHovered: boolean) => {
   return L.divIcon({
     className: "custom-marker",
@@ -116,6 +136,7 @@ export default function MapComponent({
         {/* <ZoomControl position="bottomright" />  -- defaulting to no control as per original design's manual add, but usually good to have. */}
 
         <MapController selectedAttraction={selectedAttraction} />
+        <MapResizer />
 
         {attractions.map((attraction) => (
           <Marker

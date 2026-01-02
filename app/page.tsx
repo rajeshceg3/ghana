@@ -3,8 +3,8 @@
 import { useState, useMemo } from "react"
 import dynamic from "next/dynamic"
 import { Input } from "@/components/ui/input"
-import { MapPin, Search, Menu, X } from "lucide-react"
-import { AttractionCard } from "@/components/attraction-card"
+import { MapPin, Search, Menu } from "lucide-react"
+import { AttractionList } from "@/components/attraction-list"
 import { AttractionDetails } from "@/components/attraction-details"
 import { attractions, Attraction } from "@/lib/data"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -39,32 +39,6 @@ export default function Page() {
     setSelectedAttraction(attraction)
     setIsMobileMenuOpen(false) // Close mobile menu on selection
   }
-
-  const AttractionList = () => (
-    <div className="flex flex-col h-full">
-      <div className="p-6 border-b border-amber-100 flex-shrink-0">
-        <h2 className="text-lg font-light text-gray-900 mb-2">Featured Attractions</h2>
-        <p className="text-sm text-gray-500 font-light">{filteredAttractions.length} remarkable destinations</p>
-      </div>
-
-      <div className="flex-1 overflow-y-auto">
-        <ul className="p-4 space-y-3">
-          {filteredAttractions.map((attraction) => (
-            <li key={attraction.id}>
-              <AttractionCard
-                attraction={attraction}
-                isSelected={selectedAttraction?.id === attraction.id}
-                isHovered={hoveredAttractionId === attraction.id}
-                onClick={handleAttractionSelect}
-                onMouseEnter={() => setHoveredAttractionId(attraction.id)}
-                onMouseLeave={() => setHoveredAttractionId(null)}
-              />
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
-  )
 
   return (
     <div className="h-screen w-full bg-gradient-to-br from-amber-50 via-white to-orange-50 overflow-hidden flex flex-col">
@@ -114,7 +88,14 @@ export default function Page() {
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="left" className="w-[85%] sm:w-[380px] p-0 pt-10">
-                  <AttractionList />
+                  <AttractionList
+                    attractions={filteredAttractions}
+                    selectedAttractionId={selectedAttraction?.id || null}
+                    hoveredAttractionId={hoveredAttractionId}
+                    onSelect={handleAttractionSelect}
+                    onHover={setHoveredAttractionId}
+                    onLeave={() => setHoveredAttractionId(null)}
+                  />
                 </SheetContent>
               </Sheet>
             </div>
@@ -125,13 +106,20 @@ export default function Page() {
       <main className="flex flex-1 overflow-hidden relative">
         {/* Desktop Sidebar */}
         <aside className="hidden md:flex w-96 bg-white/90 backdrop-blur-xl border-r border-amber-100 flex-col z-10 h-full">
-          <AttractionList />
+          <AttractionList
+            attractions={filteredAttractions}
+            selectedAttractionId={selectedAttraction?.id || null}
+            hoveredAttractionId={hoveredAttractionId}
+            onSelect={handleAttractionSelect}
+            onHover={setHoveredAttractionId}
+            onLeave={() => setHoveredAttractionId(null)}
+          />
         </aside>
 
         {/* Map */}
         <div className="flex-1 relative h-full w-full">
           <MapComponent
-            attractions={attractions}
+            attractions={filteredAttractions}
             selectedAttraction={selectedAttraction}
             hoveredAttractionId={hoveredAttractionId}
             onAttractionSelect={handleAttractionSelect}
