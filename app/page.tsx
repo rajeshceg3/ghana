@@ -9,6 +9,7 @@ import { AttractionDetails } from "@/components/attraction-details"
 import { attractions, Attraction } from "@/lib/data"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
+import { MapErrorBoundary } from "@/components/map-error-boundary"
 
 // Dynamically import MapComponent to avoid SSR issues with Leaflet
 const MapComponent = dynamic(() => import("@/components/map-component"), {
@@ -63,6 +64,7 @@ export default function Page() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 w-64 bg-white/50 border-amber-200 focus:border-amber-300 focus:ring-amber-200"
+                aria-label="Search attractions"
               />
             </div>
 
@@ -77,12 +79,13 @@ export default function Page() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-9 h-9 bg-white/50 border-amber-200 focus:border-amber-300 focus:ring-amber-200 text-sm"
+                  aria-label="Search attractions mobile"
                 />
               </div>
 
               <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="outline" size="icon" className="h-9 w-9 border-amber-200 text-amber-900 hover:bg-amber-50">
+                  <Button variant="outline" size="icon" className="h-9 w-9 border-amber-200 text-amber-900 hover:bg-amber-50" aria-label="Open menu">
                     <Menu className="h-4 w-4" />
                     <span className="sr-only">Open menu</span>
                   </Button>
@@ -118,12 +121,14 @@ export default function Page() {
 
         {/* Map */}
         <div className="flex-1 relative h-full w-full">
-          <MapComponent
-            attractions={filteredAttractions}
-            selectedAttraction={selectedAttraction}
-            hoveredAttractionId={hoveredAttractionId}
-            onAttractionSelect={handleAttractionSelect}
-          />
+          <MapErrorBoundary>
+            <MapComponent
+              attractions={filteredAttractions}
+              selectedAttraction={selectedAttraction}
+              hoveredAttractionId={hoveredAttractionId}
+              onAttractionSelect={handleAttractionSelect}
+            />
+          </MapErrorBoundary>
 
           {/* Attraction Detail Panel */}
           {selectedAttraction && (
