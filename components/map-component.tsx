@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect, useRef } from "react"
-import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet"
+import { useEffect, useCallback, useMemo } from "react"
+import { MapContainer, TileLayer, Marker, useMap, ZoomControl } from "react-leaflet"
 import L from "leaflet"
 import "leaflet/dist/leaflet.css"
 import { Attraction } from "@/lib/data"
@@ -48,35 +48,6 @@ function MapResizer() {
   return null
 }
 
-const createCustomIcon = (isHovered: boolean) => {
-  return L.divIcon({
-    className: "custom-marker",
-    html: `
-      <div class="marker-container" style="
-        width: 40px;
-        height: 40px;
-        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-        border: 3px solid white;
-        border-radius: 50%;
-        box-shadow: ${isHovered ? '0 8px 24px rgba(0,0,0,0.25)' : '0 4px 12px rgba(0,0,0,0.15)'};
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        cursor: pointer;
-        transform: ${isHovered ? 'scale(1.2)' : 'scale(1)'};
-      ">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-          <circle cx="12" cy="10" r="3"></circle>
-        </svg>
-      </div>
-    `,
-    iconSize: [40, 40],
-    iconAnchor: [20, 40],
-  })
-}
-
 export default function MapComponent({
   attractions,
   selectedAttraction,
@@ -95,6 +66,7 @@ export default function MapComponent({
     // though the delete operator is safe.
 
     // Using type assertion to access _getIconUrl which is not in the type definition
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     delete (L.Icon.Default.prototype as any)._getIconUrl
 
     L.Icon.Default.mergeOptions({
@@ -103,6 +75,40 @@ export default function MapComponent({
       shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
     })
   }, [])
+
+  // Memoize icon creation to avoid unnecessary recreations
+  const getCustomIcon = useCallback((isHovered: boolean) => {
+    return L.divIcon({
+      className: "custom-marker",
+      html: `
+        <div class="marker-container" style="
+          width: 40px;
+          height: 40px;
+          background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+          border: 3px solid white;
+          border-radius: 50%;
+          box-shadow: ${isHovered ? '0 8px 24px rgba(0,0,0,0.25)' : '0 4px 12px rgba(0,0,0,0.15)'};
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          cursor: pointer;
+          transform: ${isHovered ? 'scale(1.2)' : 'scale(1)'};
+        ">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+        </div>
+      `,
+      iconSize: [40, 40],
+      iconAnchor: [20, 40],
+    })
+  }, [])
+
+  // Create memoized icons for normal and hovered states
+  const normalIcon = useMemo(() => getCustomIcon(false), [getCustomIcon]);
+  const hoveredIcon = useMemo(() => getCustomIcon(true), [getCustomIcon]);
 
   return (
     <>
@@ -130,10 +136,7 @@ export default function MapComponent({
           maxZoom={19}
         />
 
-        {/* Zoom control needs to be added differently in react-leaflet or just use default position for now,
-            but the original had custom placement. Let's stick to default for simplicity or add ZoomControl if needed.
-            The original had it bottomright. */}
-        {/* <ZoomControl position="bottomright" />  -- defaulting to no control as per original design's manual add, but usually good to have. */}
+        <ZoomControl position="bottomright" />
 
         <MapController selectedAttraction={selectedAttraction} />
         <MapResizer />
@@ -142,7 +145,7 @@ export default function MapComponent({
           <Marker
             key={attraction.id}
             position={[attraction.lat, attraction.lng]}
-            icon={createCustomIcon(hoveredAttractionId === attraction.id)}
+            icon={hoveredAttractionId === attraction.id ? hoveredIcon : normalIcon}
             title={attraction.name}
             eventHandlers={{
               click: () => onAttractionSelect(attraction),
