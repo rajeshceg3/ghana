@@ -39,8 +39,9 @@ export function AttractionDetails({ attraction, onClose }: AttractionDetailsProp
           <Button
             variant="ghost"
             size="icon"
-            className="absolute top-4 right-4 bg-black/20 hover:bg-black/40 text-white rounded-full backdrop-blur-md"
+            className="absolute top-4 right-4 bg-black/20 hover:bg-black/40 text-white rounded-full backdrop-blur-md z-10"
             onClick={onClose}
+            aria-label="Close details"
           >
             <X className="w-5 h-5" />
           </Button>

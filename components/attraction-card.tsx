@@ -38,6 +38,7 @@ export function AttractionCard({
       tabIndex={0}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault() // Prevent scrolling when pressing Space
           onClick(attraction)
         }
       }}
