@@ -11,6 +11,8 @@ interface MapComponentProps {
   selectedAttraction: Attraction | null
   hoveredAttractionId: number | null
   onAttractionSelect: (attraction: Attraction) => void
+  onHover?: (id: number) => void
+  onLeave?: () => void
 }
 
 function MapController({ selectedAttraction }: { selectedAttraction: Attraction | null }) {
@@ -53,6 +55,8 @@ export default function MapComponent({
   selectedAttraction,
   hoveredAttractionId,
   onAttractionSelect,
+  onHover,
+  onLeave,
 }: MapComponentProps) {
 
   useEffect(() => {
@@ -66,7 +70,7 @@ export default function MapComponent({
     // though the delete operator is safe.
 
     // Using type assertion to access _getIconUrl which is not in the type definition
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line
     delete (L.Icon.Default.prototype as any)._getIconUrl
 
     L.Icon.Default.mergeOptions({
@@ -117,7 +121,7 @@ export default function MapComponent({
           background: transparent !important;
           border: none !important;
         }
-        .leaflet-container {
+        .custom-map-container.leaflet-container {
           width: 100%;
           height: 100%;
           background: linear-gradient(135deg, #fef7ed 0%, #fff7ed 100%) !important;
@@ -127,7 +131,7 @@ export default function MapComponent({
         center={[7.9465, -1.0232]}
         zoom={7}
         zoomControl={false}
-        className="w-full h-full"
+        className="w-full h-full custom-map-container"
       >
         <TileLayer
           url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
@@ -149,6 +153,8 @@ export default function MapComponent({
             title={attraction.name}
             eventHandlers={{
               click: () => onAttractionSelect(attraction),
+              mouseover: () => onHover?.(attraction.id),
+              mouseout: () => onLeave?.(),
             }}
           />
         ))}

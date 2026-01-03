@@ -127,6 +127,8 @@ export default function Page() {
               selectedAttraction={selectedAttraction}
               hoveredAttractionId={hoveredAttractionId}
               onAttractionSelect={handleAttractionSelect}
+              onHover={setHoveredAttractionId}
+              onLeave={() => setHoveredAttractionId(null)}
             />
           </MapErrorBoundary>
 
