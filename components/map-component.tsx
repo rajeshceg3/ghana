@@ -20,7 +20,7 @@ function MapController({ selectedAttraction }: { selectedAttraction: Attraction 
 
   useEffect(() => {
     if (selectedAttraction) {
-      map.flyTo([selectedAttraction.lat, selectedAttraction.lng], 10, {
+      map.flyTo([selectedAttraction.lat, selectedAttraction.lng], 13, {
         animate: true,
         duration: 1.5,
       })
@@ -38,7 +38,6 @@ function MapResizer() {
       map.invalidateSize()
     })
 
-    // We observe the container of the map
     const container = map.getContainer()
     observer.observe(container)
 
@@ -60,15 +59,6 @@ export default function MapComponent({
 }: MapComponentProps) {
 
   useEffect(() => {
-    // Fix for default marker icons in Leaflet with Next.js
-    // This needs to be inside useEffect to run only on client side
-    // and check if prototype modification is needed.
-    // However, since we are using custom icons, the default icon fix might not be strictly necessary
-    // for our markers, but good for fallback.
-
-    // We check if the delete has already happened to avoid errors or re-running logic unnecessarily,
-    // though the delete operator is safe.
-
     // Using type assertion to access _getIconUrl which is not in the type definition
     // eslint-disable-next-line
     delete (L.Icon.Default.prototype as any)._getIconUrl
@@ -81,38 +71,45 @@ export default function MapComponent({
   }, [])
 
   // Memoize icon creation to avoid unnecessary recreations
-  const getCustomIcon = useCallback((isHovered: boolean) => {
+  const getCustomIcon = useCallback((isHovered: boolean, isSelected: boolean) => {
+    // Colors derived from our primary "Indigo/Blue" or "Orange" logic
+    // We decided on Primary = Indigo (Stripe-ish) but markers are locations,
+    // often red or orange. Let's make them primary color (Indigo) for consistency.
+    // Or maybe keep them Orange/Warm for contrast against the map.
+    // Let's go with a very clean Indigo to match the new UI.
+    const color = isSelected ? '#4338ca' : (isHovered ? '#6366f1' : '#4f46e5'); // Indigo 700, 500, 600
+
     return L.divIcon({
       className: "custom-marker",
       html: `
         <div class="marker-container" style="
-          width: 40px;
-          height: 40px;
-          background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-          border: 3px solid white;
-          border-radius: 50%;
-          box-shadow: ${isHovered ? '0 8px 24px rgba(0,0,0,0.25)' : '0 4px 12px rgba(0,0,0,0.15)'};
+          width: 44px;
+          height: 44px;
+          background: ${color};
+          border: 4px solid white;
+          border-radius: 50% 50% 50% 0;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.2);
           display: flex;
           align-items: center;
           justify-content: center;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
           cursor: pointer;
-          transform: ${isHovered ? 'scale(1.2)' : 'scale(1)'};
+          transform: rotate(-45deg) ${isHovered || isSelected ? 'scale(1.1) translateY(-5px)' : 'scale(1)'};
         ">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-            <circle cx="12" cy="10" r="3"></circle>
-          </svg>
+           <div style="
+             width: 14px;
+             height: 14px;
+             background: white;
+             border-radius: 50%;
+             transform: rotate(45deg);
+           "></div>
         </div>
       `,
-      iconSize: [40, 40],
-      iconAnchor: [20, 40],
+      iconSize: [44, 44],
+      iconAnchor: [22, 44], // Pointing tip at location
+      popupAnchor: [0, -44]
     })
   }, [])
-
-  // Create memoized icons for normal and hovered states
-  const normalIcon = useMemo(() => getCustomIcon(false), [getCustomIcon]);
-  const hoveredIcon = useMemo(() => getCustomIcon(true), [getCustomIcon]);
 
   return (
     <>
@@ -124,7 +121,30 @@ export default function MapComponent({
         .custom-map-container.leaflet-container {
           width: 100%;
           height: 100%;
-          background: linear-gradient(135deg, #fef7ed 0%, #fff7ed 100%) !important;
+          background: #f8fafc; /* Slate 50 */
+          outline: none;
+        }
+        .leaflet-control-zoom {
+          border: none !important;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+          border-radius: 8px !important;
+          overflow: hidden;
+        }
+        .leaflet-control-zoom a {
+          background: white !important;
+          color: #1e293b !important;
+          border-bottom: 1px solid #e2e8f0 !important;
+          transition: background 0.2s;
+        }
+        .leaflet-control-zoom a:hover {
+          background: #f1f5f9 !important;
+        }
+        .leaflet-control-attribution {
+          background: rgba(255, 255, 255, 0.8) !important;
+          backdrop-filter: blur(4px);
+          padding: 0 8px !important;
+          border-top-left-radius: 6px;
+          color: #64748b !important;
         }
       `}</style>
       <MapContainer
@@ -134,7 +154,7 @@ export default function MapComponent({
         className="w-full h-full custom-map-container"
       >
         <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
           subdomains="abcd"
           maxZoom={19}
@@ -145,19 +165,23 @@ export default function MapComponent({
         <MapController selectedAttraction={selectedAttraction} />
         <MapResizer />
 
-        {attractions.map((attraction) => (
-          <Marker
-            key={attraction.id}
-            position={[attraction.lat, attraction.lng]}
-            icon={hoveredAttractionId === attraction.id ? hoveredIcon : normalIcon}
-            title={attraction.name}
-            eventHandlers={{
-              click: () => onAttractionSelect(attraction),
-              mouseover: () => onHover?.(attraction.id),
-              mouseout: () => onLeave?.(),
-            }}
-          />
-        ))}
+        {attractions.map((attraction) => {
+           const isSelected = selectedAttraction?.id === attraction.id
+           const isHovered = hoveredAttractionId === attraction.id
+           return (
+            <Marker
+              key={attraction.id}
+              position={[attraction.lat, attraction.lng]}
+              icon={getCustomIcon(isHovered, isSelected)}
+              title={attraction.name}
+              eventHandlers={{
+                click: () => onAttractionSelect(attraction),
+                mouseover: () => onHover?.(attraction.id),
+                mouseout: () => onLeave?.(),
+              }}
+            />
+          )
+        })}
       </MapContainer>
     </>
   )
