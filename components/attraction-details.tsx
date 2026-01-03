@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Star, Clock, Camera } from "lucide-react"
+import { Star, Clock, MapPin, X, ArrowRight, Share2 } from "lucide-react"
 import Image from "next/image"
 import { Attraction, categoryColors } from "@/lib/data"
 import {
@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogClose
 } from "@/components/ui/dialog"
 
 interface AttractionDetailsProps {
@@ -19,71 +20,77 @@ interface AttractionDetailsProps {
 export function AttractionDetails({ attraction, onClose }: AttractionDetailsProps) {
   return (
     <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="p-0 overflow-hidden sm:max-w-[600px] border-0 shadow-2xl bg-white/95 backdrop-blur-xl">
+      <DialogContent className="p-0 overflow-hidden sm:max-w-[700px] border-0 shadow-[0_40px_80px_-15px_rgba(0,0,0,0.3)] bg-background rounded-2xl gap-0 ring-1 ring-white/10">
         <DialogHeader className="sr-only">
           <DialogTitle>{attraction.name}</DialogTitle>
           <DialogDescription>Details about {attraction.name}</DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col md:flex-row h-full max-h-[80vh] overflow-y-auto md:overflow-visible">
-          <div className="w-full md:w-56 h-48 md:h-auto bg-gradient-to-br from-amber-100 to-orange-100 relative shrink-0">
-            <Image
-              src={attraction.image || "/placeholder.svg"}
-              alt={attraction.name}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 224px"
-            />
-            <div className="absolute top-3 left-3">
-              <Badge
-                className={`text-xs font-light ${categoryColors[attraction.category]}`}
-              >
+        <div className="relative w-full h-64 sm:h-72 bg-muted">
+          <Image
+            src={attraction.image || "/placeholder.svg"}
+            alt={attraction.name}
+            fill
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
+
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-4 right-4 bg-black/20 hover:bg-black/40 text-white rounded-full backdrop-blur-md"
+            onClick={onClose}
+          >
+            <X className="w-5 h-5" />
+          </Button>
+
+          <div className="absolute bottom-0 left-0 p-6 sm:p-8 w-full">
+             <Badge className="mb-3 border-0 bg-white/90 text-black backdrop-blur-md hover:bg-white shadow-sm font-medium px-3 py-1">
                 {attraction.category}
-              </Badge>
-            </div>
+             </Badge>
+             <h2 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight mb-2 drop-shadow-sm">{attraction.name}</h2>
+             <div className="flex items-center gap-4 text-foreground/80 font-medium text-sm">
+                <div className="flex items-center gap-1.5 bg-background/50 backdrop-blur-md px-2 py-1 rounded-md shadow-sm">
+                  <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+                  <span>{attraction.rating}</span>
+                </div>
+                <div className="flex items-center gap-1.5 bg-background/50 backdrop-blur-md px-2 py-1 rounded-md shadow-sm">
+                  <Clock className="w-4 h-4 text-primary" />
+                  <span>{attraction.duration}</span>
+                </div>
+             </div>
           </div>
+        </div>
 
-          <div className="flex-1 p-6 flex flex-col">
-            <div className="mb-3">
-              <h3 className="text-xl font-light text-gray-900 mb-1">{attraction.name}</h3>
-              <div className="flex items-center space-x-4 text-sm text-gray-600">
-                <div className="flex items-center space-x-1">
-                  <Star className="w-4 h-4 text-amber-400 fill-current" />
-                  <span className="font-light">{attraction.rating}</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <Clock className="w-4 h-4" />
-                  <span className="font-light">{attraction.duration}</span>
-                </div>
-              </div>
-            </div>
-
-            <p className="text-sm text-gray-600 font-light leading-relaxed mb-4 flex-1">
+        <div className="p-6 sm:p-8 pt-4 flex flex-col sm:flex-row gap-8">
+          <div className="flex-1">
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">About</h3>
+            <p className="text-base text-foreground leading-relaxed mb-6 font-normal">
               {attraction.description}
             </p>
 
-            <div className="flex flex-wrap gap-2 mb-4">
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Highlights</h3>
+            <div className="flex flex-wrap gap-2 mb-8">
               {attraction.highlights.map((highlight, index) => (
                 <Badge
                   key={index}
                   variant="secondary"
-                  className="text-xs font-light bg-amber-50 text-amber-700 border-amber-200"
+                  className="px-3 py-1 bg-secondary text-secondary-foreground hover:bg-secondary/80 border-0 text-sm font-normal"
                 >
                   {highlight}
                 </Badge>
               ))}
             </div>
 
-            <div className="flex space-x-3 mt-auto">
-              <Button className="bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white border-0 font-light flex-1 sm:flex-none">
-                <Camera className="w-4 h-4 mr-2" />
-                View Gallery
-              </Button>
-              <Button
-                variant="outline"
-                className="border-amber-200 text-amber-700 hover:bg-amber-50 font-light bg-transparent flex-1 sm:flex-none"
-              >
+            <div className="flex gap-3 mt-auto">
+              <Button size="lg" className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20 font-medium">
                 Get Directions
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+              <Button size="lg" variant="outline" className="flex-1 border-input hover:bg-muted font-medium">
+                <Share2 className="w-4 h-4 mr-2" />
+                Share
               </Button>
             </div>
           </div>
