@@ -59,9 +59,13 @@ export default function MapComponent({
 }: MapComponentProps) {
 
   useEffect(() => {
-    // Using type assertion to access _getIconUrl which is not in the type definition
-    // eslint-disable-next-line
-    delete (L.Icon.Default.prototype as any)._getIconUrl
+    // Fix for Leaflet's default icon path issues in webpack/Next.js
+    // We safely access the prototype by casting to 'any' because strict types
+    // don't include internal private methods like _getIconUrl.
+    const iconDefaultPrototype = L.Icon.Default.prototype as any
+    if (iconDefaultPrototype._getIconUrl) {
+      delete iconDefaultPrototype._getIconUrl
+    }
 
     L.Icon.Default.mergeOptions({
       iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
@@ -71,7 +75,7 @@ export default function MapComponent({
   }, [])
 
   // Memoize icon creation to avoid unnecessary recreations
-  const getCustomIcon = useCallback((isHovered: boolean, isSelected: boolean) => {
+  const getCustomIcon = useCallback((isHovered: boolean, isSelected: boolean, title: string) => {
     // Colors derived from our primary "Indigo/Blue" or "Orange" logic
     // We decided on Primary = Indigo (Stripe-ish) but markers are locations,
     // often red or orange. Let's make them primary color (Indigo) for consistency.
@@ -82,7 +86,11 @@ export default function MapComponent({
     return L.divIcon({
       className: "custom-marker",
       html: `
-        <div class="marker-container" style="
+        <div class="marker-container"
+             tabindex="0"
+             role="button"
+             aria-label="${title}"
+             style="
           width: 44px;
           height: 44px;
           background: ${color};
@@ -113,40 +121,6 @@ export default function MapComponent({
 
   return (
     <>
-      <style jsx global>{`
-        .custom-marker {
-          background: transparent !important;
-          border: none !important;
-        }
-        .custom-map-container.leaflet-container {
-          width: 100%;
-          height: 100%;
-          background: #f8fafc; /* Slate 50 */
-          outline: none;
-        }
-        .leaflet-control-zoom {
-          border: none !important;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
-          border-radius: 8px !important;
-          overflow: hidden;
-        }
-        .leaflet-control-zoom a {
-          background: white !important;
-          color: #1e293b !important;
-          border-bottom: 1px solid #e2e8f0 !important;
-          transition: background 0.2s;
-        }
-        .leaflet-control-zoom a:hover {
-          background: #f1f5f9 !important;
-        }
-        .leaflet-control-attribution {
-          background: rgba(255, 255, 255, 0.8) !important;
-          backdrop-filter: blur(4px);
-          padding: 0 8px !important;
-          border-top-left-radius: 6px;
-          color: #64748b !important;
-        }
-      `}</style>
       <MapContainer
         center={[7.9465, -1.0232]}
         zoom={7}
@@ -172,12 +146,17 @@ export default function MapComponent({
             <Marker
               key={attraction.id}
               position={[attraction.lat, attraction.lng]}
-              icon={getCustomIcon(isHovered, isSelected)}
+              icon={getCustomIcon(isHovered, isSelected, attraction.name)}
               title={attraction.name}
               eventHandlers={{
                 click: () => onAttractionSelect(attraction),
                 mouseover: () => onHover?.(attraction.id),
                 mouseout: () => onLeave?.(),
+                keydown: (e: any) => {
+                   if (e.originalEvent.key === 'Enter' || e.originalEvent.key === ' ') {
+                     onAttractionSelect(attraction)
+                   }
+                }
               }}
             />
           )
