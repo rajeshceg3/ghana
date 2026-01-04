@@ -73,9 +73,9 @@ export function AttractionDetails({ attraction, onClose }: AttractionDetailsProp
 
             <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Highlights</h3>
             <div className="flex flex-wrap gap-2 mb-8">
-              {attraction.highlights.map((highlight, index) => (
+              {attraction.highlights.map((highlight) => (
                 <Badge
-                  key={index}
+                  key={highlight}
                   variant="secondary"
                   className="px-3 py-1 bg-secondary text-secondary-foreground hover:bg-secondary/80 border-0 text-sm font-normal"
                 >
