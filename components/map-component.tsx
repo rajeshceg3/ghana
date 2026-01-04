@@ -68,14 +68,17 @@ export default function MapComponent({
     }
 
     L.Icon.Default.mergeOptions({
-      iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
-      iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
-      shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+      iconRetinaUrl: '/images/leaflet/marker-icon-2x.png',
+      iconUrl: '/images/leaflet/marker-icon.png',
+      shadowUrl: '/images/leaflet/marker-shadow.png',
     })
   }, [])
 
   // Memoize icon creation to avoid unnecessary recreations
   const getCustomIcon = useCallback((isHovered: boolean, isSelected: boolean, title: string) => {
+    // Escape the title to prevent XSS when injecting into HTML string
+    const safeTitle = title.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
     // Colors derived from our primary "Indigo/Blue" or "Orange" logic
     // We decided on Primary = Indigo (Stripe-ish) but markers are locations,
     // often red or orange. Let's make them primary color (Indigo) for consistency.
@@ -89,7 +92,7 @@ export default function MapComponent({
         <div class="marker-container"
              tabindex="0"
              role="button"
-             aria-label="${title}"
+             aria-label="${safeTitle}"
              style="
           width: 44px;
           height: 44px;
