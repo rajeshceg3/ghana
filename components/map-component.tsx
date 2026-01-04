@@ -77,7 +77,12 @@ export default function MapComponent({
   // Memoize icon creation to avoid unnecessary recreations
   const getCustomIcon = useCallback((isHovered: boolean, isSelected: boolean, title: string) => {
     // Escape the title to prevent XSS when injecting into HTML string
-    const safeTitle = title.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const safeTitle = title
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
 
     // Colors derived from our primary "Indigo/Blue" or "Orange" logic
     // We decided on Primary = Indigo (Stripe-ish) but markers are locations,

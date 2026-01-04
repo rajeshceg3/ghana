@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect, useRef } from "react"
 import dynamic from "next/dynamic"
 import { Input } from "@/components/ui/input"
 import { MapPin, Search, Menu, Command } from "lucide-react"
@@ -31,6 +31,18 @@ export default function Page() {
   const [searchQuery, setSearchQuery] = useState("")
   const [hoveredAttractionId, setHoveredAttractionId] = useState<number | null>(null)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault()
+        searchInputRef.current?.focus()
+      }
+    }
+    document.addEventListener("keydown", handleKeyDown)
+    return () => document.removeEventListener("keydown", handleKeyDown)
+  }, [])
 
   const filteredAttractions = useMemo(() => attractions.filter(
     (attraction) =>
@@ -63,6 +75,7 @@ export default function Page() {
             <div className="relative hidden md:block group">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
               <Input
+                ref={searchInputRef}
                 placeholder="Search attractions..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
