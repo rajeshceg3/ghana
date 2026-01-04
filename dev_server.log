@@ -7,9 +7,6 @@
 - Network:       http://192.168.0.2:3000
 
 ✓ Starting...
-✓ Ready in 696ms
-○ Compiling /_not-found/page ...
- GET /robots.txt 404 in 4.3s (compile: 4.0s, render: 284ms)
- GET / 200 in 1977ms (compile: 1777ms, render: 200ms)
- GET / 200 in 83ms (compile: 4ms, render: 79ms)
- GET / 200 in 543ms (compile: 203ms, render: 340ms)
+✓ Ready in 7s
+○ Compiling / ...
+ GET / 200 in 8.9s (compile: 8.2s, render: 703ms)
