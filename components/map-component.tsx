@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useCallback, useMemo } from "react"
+import { useEffect, useCallback, useMemo, useRef } from "react"
 import { MapContainer, TileLayer, Marker, useMap, ZoomControl } from "react-leaflet"
 import L from "leaflet"
 import "leaflet/dist/leaflet.css"
@@ -74,8 +74,38 @@ export default function MapComponent({
     })
   }, [])
 
+  // Track the last focused marker ID to restore focus after icon recreation
+  const lastFocusedMarkerId = useRef<number | null>(null)
+
+  useEffect(() => {
+    // Capture focus events to track which marker was last focused
+    const handleFocus = (e: FocusEvent) => {
+      const target = e.target as HTMLElement
+      if (target && target.id && target.id.startsWith('marker-')) {
+        const id = parseInt(target.id.replace('marker-', ''), 10)
+        lastFocusedMarkerId.current = id
+      } else if (target && !target.closest('.leaflet-container')) {
+        // Clear if focus moves outside map
+        lastFocusedMarkerId.current = null
+      }
+    }
+
+    document.addEventListener('focus', handleFocus, true)
+    return () => document.removeEventListener('focus', handleFocus, true)
+  }, [])
+
+  // Restore focus after render if necessary
+  useEffect(() => {
+    if (lastFocusedMarkerId.current !== null) {
+      const element = document.getElementById(`marker-${lastFocusedMarkerId.current}`)
+      if (element && document.activeElement !== element) {
+        element.focus()
+      }
+    }
+  })
+
   // Memoize icon creation to avoid unnecessary recreations
-  const getCustomIcon = useCallback((isHovered: boolean, isSelected: boolean, title: string) => {
+  const getCustomIcon = useCallback((isHovered: boolean, isSelected: boolean, title: string, id: number) => {
     // Escape the title to prevent XSS when injecting into HTML string
     const safeTitle = title
       .replace(/&/g, '&amp;')
@@ -94,7 +124,8 @@ export default function MapComponent({
     return L.divIcon({
       className: "custom-marker",
       html: `
-        <div class="marker-container"
+        <div id="marker-${id}"
+             class="marker-container"
              tabindex="0"
              role="button"
              aria-label="${safeTitle}"
@@ -154,7 +185,7 @@ export default function MapComponent({
             <Marker
               key={attraction.id}
               position={[attraction.lat, attraction.lng]}
-              icon={getCustomIcon(isHovered, isSelected, attraction.name)}
+              icon={getCustomIcon(isHovered, isSelected, attraction.name, attraction.id)}
               title={attraction.name}
               eventHandlers={{
                 click: () => onAttractionSelect(attraction),
@@ -162,6 +193,8 @@ export default function MapComponent({
                 mouseout: () => onLeave?.(),
                 keydown: (e: any) => {
                    if (e.originalEvent.key === 'Enter' || e.originalEvent.key === ' ') {
+                     // Prevent default to avoid map panning
+                     e.originalEvent.preventDefault()
                      onAttractionSelect(attraction)
                    }
                 }
