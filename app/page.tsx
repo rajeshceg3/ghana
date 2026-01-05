@@ -33,6 +33,26 @@ export default function Page() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
 
+  // Debounce logic for hover to prevent flickering
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  const handleHover = (id: number) => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current)
+      hoverTimeoutRef.current = null
+    }
+    setHoveredAttractionId(id)
+  }
+
+  const handleLeave = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current)
+    }
+    hoverTimeoutRef.current = setTimeout(() => {
+      setHoveredAttractionId(null)
+    }, 50) // Short delay to allow moving to another item
+  }
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
@@ -44,11 +64,14 @@ export default function Page() {
     return () => document.removeEventListener("keydown", handleKeyDown)
   }, [])
 
-  const filteredAttractions = useMemo(() => attractions.filter(
-    (attraction) =>
-      attraction.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      attraction.category.toLowerCase().includes(searchQuery.toLowerCase()),
-  ), [searchQuery])
+  const filteredAttractions = useMemo(() => {
+    const lowerQuery = searchQuery.toLowerCase()
+    return attractions.filter(
+      (attraction) =>
+        attraction.name.toLowerCase().includes(lowerQuery) ||
+        attraction.category.toLowerCase().includes(lowerQuery),
+    )
+  }, [searchQuery])
 
   const handleAttractionSelect = (attraction: Attraction) => {
     setSelectedAttraction(attraction)
@@ -109,8 +132,8 @@ export default function Page() {
                     <span className="sr-only">Open menu</span>
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="left" className="w-[85%] sm:w-[380px] p-0 pt-0 gap-0 border-r">
-                  <div className="p-6 border-b bg-muted/10">
+                <SheetContent side="left" className="w-[85%] sm:w-[380px] p-0 pt-0 gap-0 border-r flex flex-col">
+                  <div className="p-6 border-b bg-muted/10 flex-shrink-0">
                     <h2 className="text-lg font-semibold tracking-tight">Attractions</h2>
                     <p className="text-sm text-muted-foreground mt-1">Explore {filteredAttractions.length} destinations</p>
                   </div>
@@ -119,8 +142,8 @@ export default function Page() {
                     selectedAttractionId={selectedAttraction?.id || null}
                     hoveredAttractionId={hoveredAttractionId}
                     onSelect={handleAttractionSelect}
-                    onHover={setHoveredAttractionId}
-                    onLeave={() => setHoveredAttractionId(null)}
+                    onHover={handleHover}
+                    onLeave={handleLeave}
                   />
                 </SheetContent>
               </Sheet>
@@ -148,8 +171,8 @@ export default function Page() {
             selectedAttractionId={selectedAttraction?.id || null}
             hoveredAttractionId={hoveredAttractionId}
             onSelect={handleAttractionSelect}
-            onHover={setHoveredAttractionId}
-            onLeave={() => setHoveredAttractionId(null)}
+            onHover={handleHover}
+            onLeave={handleLeave}
           />
         </aside>
 
@@ -161,8 +184,8 @@ export default function Page() {
               selectedAttraction={selectedAttraction}
               hoveredAttractionId={hoveredAttractionId}
               onAttractionSelect={handleAttractionSelect}
-              onHover={setHoveredAttractionId}
-              onLeave={() => setHoveredAttractionId(null)}
+              onHover={handleHover}
+              onLeave={handleLeave}
             />
           </MapErrorBoundary>
 
