@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect, useRef } from "react"
 import dynamic from "next/dynamic"
 import { Input } from "@/components/ui/input"
-import { MapPin, Search, Menu, Command } from "lucide-react"
+import { MapPin, Search, Menu, Command, X } from "lucide-react"
 import { AttractionList } from "@/components/attraction-list"
 import { AttractionDetails } from "@/components/attraction-details"
 import { attractions, Attraction } from "@/lib/data"
@@ -44,7 +44,7 @@ export default function Page() {
     setHoveredAttractionId(id)
   }
 
-  const handleLeave = () => {
+  const handleLeave = (id?: number) => {
     if (hoverTimeoutRef.current) {
       clearTimeout(hoverTimeoutRef.current)
     }
@@ -102,13 +102,27 @@ export default function Page() {
                 placeholder="Search attractions..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 w-72 bg-muted/40 border-transparent focus:bg-background focus:border-primary/20 focus:ring-4 focus:ring-primary/10 rounded-full transition-all duration-300 h-10 shadow-sm"
+                className="pl-10 pr-20 w-72 bg-muted/40 border-transparent focus:bg-background focus:border-primary/20 focus:ring-4 focus:ring-primary/10 rounded-full transition-all duration-300 h-10 shadow-sm"
                 aria-label="Search attractions"
               />
-              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 hidden lg:flex items-center gap-1 pointer-events-none">
-                <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
-                  <span className="text-xs">⌘</span>K
-                </kbd>
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
+                {searchQuery && (
+                  <button
+                    onClick={() => {
+                        setSearchQuery("")
+                        searchInputRef.current?.focus()
+                    }}
+                    className="text-muted-foreground hover:text-foreground transition-colors mr-1"
+                    aria-label="Clear search"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+                <div className="hidden lg:flex items-center gap-1 pointer-events-none">
+                  <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+                    <span className="text-xs">⌘</span>K
+                  </kbd>
+                </div>
               </div>
             </div>
 

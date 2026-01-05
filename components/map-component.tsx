@@ -62,7 +62,7 @@ export default function MapComponent({
     // Fix for Leaflet's default icon path issues in webpack/Next.js
     // We safely access the prototype by casting to 'any' because strict types
     // don't include internal private methods like _getIconUrl.
-    const iconDefaultPrototype = L.Icon.Default.prototype as any
+    const iconDefaultPrototype = L.Icon.Default.prototype as unknown as { _getIconUrl?: string }
     if (iconDefaultPrototype._getIconUrl) {
       delete iconDefaultPrototype._getIconUrl
     }
@@ -99,7 +99,10 @@ export default function MapComponent({
     if (lastFocusedMarkerId.current !== null) {
       const element = document.getElementById(`marker-${lastFocusedMarkerId.current}`)
       if (element && document.activeElement !== element) {
-        element.focus()
+        // Only attempt focus if the element is connected to DOM
+        if (element.isConnected) {
+            element.focus()
+        }
       }
     }
   })
@@ -165,6 +168,7 @@ export default function MapComponent({
         zoom={7}
         zoomControl={false}
         className="w-full h-full custom-map-container"
+        aria-label="Map of Ghana Attractions"
       >
         <TileLayer
           url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
@@ -191,10 +195,11 @@ export default function MapComponent({
                 click: () => onAttractionSelect(attraction),
                 mouseover: () => onHover?.(attraction.id),
                 mouseout: () => onLeave?.(),
-                keydown: (e: any) => {
-                   if (e.originalEvent.key === 'Enter' || e.originalEvent.key === ' ') {
+                keydown: (e) => {
+                  const event = e.originalEvent as KeyboardEvent
+                   if (event.key === 'Enter' || event.key === ' ') {
                      // Prevent default to avoid map panning
-                     e.originalEvent.preventDefault()
+                     event.preventDefault()
                      onAttractionSelect(attraction)
                    }
                 }
