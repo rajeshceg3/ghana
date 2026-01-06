@@ -47,7 +47,7 @@ export function AttractionList({
             </div>
             <h3 className="text-sm font-semibold text-foreground mb-1">No places found</h3>
             <p className="text-xs text-muted-foreground max-w-[200px]">
-              Try adjusting your search to find what you're looking for.
+              Try adjusting your search to find what you&apos;re looking for.
             </p>
           </div>
         )}

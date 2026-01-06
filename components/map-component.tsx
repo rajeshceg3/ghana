@@ -129,9 +129,6 @@ export default function MapComponent({
       html: `
         <div id="marker-${id}"
              class="marker-container"
-             tabindex="0"
-             role="button"
-             aria-label="${safeTitle}"
              style="
           width: 44px;
           height: 44px;
