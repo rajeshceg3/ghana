@@ -5,9 +5,10 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Stripe-like "Clean" Theme using Slate and a Vivid Primary */
-  --background: oklch(1 0 0); /* White */
-  --foreground: oklch(0.20 0.02 265); /* Slate 900 */
+  /* Stripe-like "Clean" Theme using OKLCH */
+  /* Backgrounds: Extremely clean white and very subtle off-whites */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.20 0.02 265); /* Deep Slate */
 
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.20 0.02 265);
@@ -15,23 +16,16 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.20 0.02 265);
 
-  /* Primary: A sophisticated, vibrant Indigo/Violet (Stripe-ish) or a refined Ochre.
-     Let's go with a rich, modern Indigo-Blue as it screams "tech/polished",
-     but maybe the user wants to keep the "Ghana" feel?
-     I'll stick to a very high-quality Orange/Amber accent to respect the original theme but polished.
-     Let's try a vivid Orange-Red (Tomato/Coral) mixed with amber.
-     Actually, let's use a standard "Brand" color. oklch(0.55 0.2 60) is a nice burnt orange.
-     But for "Stripe" feel, we often see Indigo.
-     I will use a Deep Indigo for Primary UI elements to contrast with the warm content images.
-  */
-  --primary: oklch(0.35 0.15 265); /* Deep Indigo/Blue */
+  /* Primary: A sophisticated, vibrant Indigo (Stripe/Linear style) */
+  --primary: oklch(0.45 0.24 275); /* Vibrant Indigo */
   --primary-foreground: oklch(1 0 0);
 
-  --secondary: oklch(0.97 0.01 265); /* Slate 50 */
+  /* Secondary: Very subtle cool gray for backgrounds/hover states */
+  --secondary: oklch(0.97 0.01 265);
   --secondary-foreground: oklch(0.20 0.02 265);
 
   --muted: oklch(0.96 0.01 265);
-  --muted-foreground: oklch(0.55 0.03 265);
+  --muted-foreground: oklch(0.50 0.03 265); /* Softer text for secondary info */
 
   --accent: oklch(0.96 0.01 265);
   --accent-foreground: oklch(0.20 0.02 265);
@@ -39,65 +33,66 @@
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(1 0 0);
 
-  --border: oklch(0.92 0.01 265); /* Slate 200 */
+  --border: oklch(0.92 0.01 265); /* Subtle border */
   --input: oklch(0.92 0.01 265);
-  --ring: oklch(0.35 0.15 265);
+  --ring: oklch(0.45 0.24 275); /* Matches Primary */
 
-  --radius: 0.75rem; /* 12px for softer, modern corners */
+  --radius: 0.75rem; /* 12px for modern, friendly corners */
 
-  /* Charts - keeping mostly same or adjusting */
+  /* Sidebar specific variables */
+  --sidebar: oklch(0.99 0.005 265); /* Nearly white, very subtle tint */
+  --sidebar-foreground: oklch(0.20 0.02 265);
+  --sidebar-primary: oklch(0.45 0.24 275);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.96 0.01 265);
+  --sidebar-accent-foreground: oklch(0.20 0.02 265);
+  --sidebar-border: oklch(0.92 0.01 265);
+  --sidebar-ring: oklch(0.45 0.24 275);
+
+  /* Charts */
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-
-  --sidebar: oklch(0.99 0 0); /* Very slightly off-white */
-  --sidebar-foreground: oklch(0.20 0.02 265);
-  --sidebar-primary: oklch(0.35 0.15 265);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.96 0.01 265);
-  --sidebar-accent-foreground: oklch(0.20 0.02 265);
-  --sidebar-border: oklch(0.92 0.01 265);
-  --sidebar-ring: oklch(0.35 0.15 265);
 }
 
 .dark {
   --background: oklch(0.12 0.02 265); /* Slate 950 */
   --foreground: oklch(0.98 0.01 265);
 
-  --card: oklch(0.15 0.02 265); /* Slate 900 */
+  --card: oklch(0.15 0.02 265);
   --card-foreground: oklch(0.98 0.01 265);
 
   --popover: oklch(0.15 0.02 265);
   --popover-foreground: oklch(0.98 0.01 265);
 
-  --primary: oklch(0.65 0.18 265); /* Brighter Indigo/Blue for dark mode */
+  --primary: oklch(0.65 0.18 265); /* Brighter Indigo for dark mode */
   --primary-foreground: oklch(0.12 0.02 265);
 
-  --secondary: oklch(0.25 0.02 265);
+  --secondary: oklch(0.20 0.02 265);
   --secondary-foreground: oklch(0.98 0.01 265);
 
-  --muted: oklch(0.25 0.02 265);
+  --muted: oklch(0.20 0.02 265);
   --muted-foreground: oklch(0.70 0.02 265);
 
-  --accent: oklch(0.25 0.02 265);
+  --accent: oklch(0.20 0.02 265);
   --accent-foreground: oklch(0.98 0.01 265);
 
   --destructive: oklch(0.396 0.141 25.723);
   --destructive-foreground: oklch(0.98 0.01 265);
 
-  --border: oklch(0.25 0.02 265);
-  --input: oklch(0.25 0.02 265);
+  --border: oklch(0.20 0.02 265);
+  --input: oklch(0.20 0.02 265);
   --ring: oklch(0.65 0.18 265);
 
   --sidebar: oklch(0.15 0.02 265);
   --sidebar-foreground: oklch(0.98 0.01 265);
   --sidebar-primary: oklch(0.65 0.18 265);
   --sidebar-primary-foreground: oklch(0.12 0.02 265);
-  --sidebar-accent: oklch(0.25 0.02 265);
+  --sidebar-accent: oklch(0.20 0.02 265);
   --sidebar-accent-foreground: oklch(0.98 0.01 265);
-  --sidebar-border: oklch(0.25 0.02 265);
+  --sidebar-border: oklch(0.20 0.02 265);
   --sidebar-ring: oklch(0.65 0.18 265);
 }
 
@@ -139,11 +134,15 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  /* Custom utilities for that "Stripe" polish */
-  --shadow-subtle: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-soft: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
-  --shadow-float: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.08);
-  --shadow-pop: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  /* Premium Shadows - Multi-layered for depth */
+  --shadow-subtle: 0 1px 2px 0 rgb(0 0 0 / 0.03), 0 1px 1px -1px rgb(0 0 0 / 0.02);
+  --shadow-soft: 0 4px 6px -1px rgb(0 0 0 / 0.02), 0 2px 4px -2px rgb(0 0 0 / 0.02), 0 0 0 1px rgb(0 0 0 / 0.02);
+  --shadow-float: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05), 0 0 0 1px rgb(0 0 0 / 0.02);
+  --shadow-pop: 0 20px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.08), 0 0 0 1px rgb(0 0 0 / 0.02);
+
+  /* Animation Utilities */
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.1); /* Bouncy spring */
+  --ease-smooth: cubic-bezier(0.25, 0.1, 0.25, 1); /* Smooth ease */
 }
 
 @layer base {
@@ -153,13 +152,15 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1; /* Optimize font rendering */
+    -webkit-font-smoothing: antialiased; /* Crisp text */
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
 /* Scrollbar Polish */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;

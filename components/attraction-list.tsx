@@ -20,11 +20,16 @@ export function AttractionList({
 }: AttractionListProps) {
   return (
     <div className="flex flex-col h-full bg-transparent">
-      {/* Note: Header is now handled in parent for better flexibility, but we can add a spacer if needed */}
-
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 scroll-smooth">
-        {attractions.map((attraction) => (
-          <div key={attraction.id} className="transform transition-all duration-300">
+      <div className="flex-1 space-y-3 px-3 py-2">
+        {attractions.map((attraction, index) => (
+          <div
+            key={attraction.id}
+            style={{
+              animationDelay: `${index * 30}ms`,
+              opacity: 0,
+              animation: 'fadeInUp 0.5s ease-out forwards'
+            }}
+          >
             <AttractionCard
               attraction={attraction}
               isSelected={selectedAttractionId === attraction.id}
@@ -36,11 +41,29 @@ export function AttractionList({
           </div>
         ))}
         {attractions.length === 0 && (
-          <div className="text-center py-10">
-            <p className="text-muted-foreground text-sm">No attractions found.</p>
+          <div className="flex flex-col items-center justify-center py-16 text-center px-4">
+            <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-3">
+               <span className="text-xl">🔍</span>
+            </div>
+            <h3 className="text-sm font-semibold text-foreground mb-1">No places found</h3>
+            <p className="text-xs text-muted-foreground max-w-[200px]">
+              Try adjusting your search to find what you're looking for.
+            </p>
           </div>
         )}
       </div>
+      <style jsx>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </div>
   )
 }
