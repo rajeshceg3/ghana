@@ -7,7 +7,7 @@ import { MapPin, Search, Menu, X, ArrowRight } from "lucide-react"
 import { AttractionList } from "@/components/attraction-list"
 import { AttractionDetails } from "@/components/attraction-details"
 import { attractions, Attraction } from "@/lib/data"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetTrigger, SheetDescription, SheetTitle } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { MapErrorBoundary } from "@/components/map-error-boundary"
 import { Badge } from "@/components/ui/badge"
@@ -153,7 +153,11 @@ export default function Page() {
                     <Menu className="h-5 w-5" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="left" className="w-[85%] sm:w-[380px] p-0 pt-0 gap-0 border-r flex flex-col bg-sidebar">
+                <SheetContent side="left" className="w-[85%] sm:w-[380px] p-0 pt-0 gap-0 border-r flex flex-col bg-sidebar z-[2000]">
+                  <SheetTitle className="sr-only">Attractions Menu</SheetTitle>
+                  <SheetDescription className="sr-only">
+                    List of attractions and destinations
+                  </SheetDescription>
                   <div className="p-6 border-b border-sidebar-border bg-sidebar flex-shrink-0">
                     <h2 className="text-lg font-bold tracking-tight text-sidebar-foreground">Attractions</h2>
                     <p className="text-sm text-sidebar-foreground/60 mt-1">Explore {filteredAttractions.length} destinations</p>

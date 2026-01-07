@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useCallback, useMemo, useRef } from "react"
-import { MapContainer, TileLayer, Marker, useMap, ZoomControl } from "react-leaflet"
+import { MapContainer, TileLayer, Marker, useMap, ZoomControl, Tooltip } from "react-leaflet"
 import L from "leaflet"
 import "leaflet/dist/leaflet.css"
 import { Attraction } from "@/lib/data"
@@ -201,7 +201,16 @@ export default function MapComponent({
                    }
                 }
               }}
-            />
+            >
+              <Tooltip
+                direction="top"
+                offset={[0, -44]}
+                opacity={1}
+                className="font-sans font-medium text-sm shadow-md border-none px-3 py-1.5 rounded-md text-foreground"
+              >
+                {attraction.name}
+              </Tooltip>
+            </Marker>
           )
         })}
       </MapContainer>
