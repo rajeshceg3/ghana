@@ -34,9 +34,10 @@ export function AttractionDetails({ attraction, onClose }: AttractionDetailsProp
             fill
             className="object-cover transition-transform duration-1000 group-hover:scale-105"
             priority
+            sizes="(max-width: 768px) 100vw, 700px"
           />
           {/* Enhanced Gradient for text readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
 
           {/* Floating Close Button */}
           <Button
@@ -62,14 +63,14 @@ export function AttractionDetails({ attraction, onClose }: AttractionDetailsProp
 
              <h2 className="text-4xl sm:text-5xl font-bold tracking-tight mb-2 text-white drop-shadow-md">{attraction.name}</h2>
 
-             <div className="flex items-center gap-4 text-white/90 font-medium text-sm mt-4">
+             <div className="flex items-center gap-4 text-white font-medium text-sm mt-4">
                 <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-white/80" />
+                  <Clock className="w-4 h-4 text-white/90" />
                   <span>{attraction.duration}</span>
                 </div>
-                <div className="w-1 h-1 bg-white/40 rounded-full" />
+                <div className="w-1 h-1 bg-white/60 rounded-full" />
                 <div className="flex items-center gap-2">
-                   <MapPin className="w-4 h-4 text-white/80" />
+                   <MapPin className="w-4 h-4 text-white/90" />
                    <span>Accra, Ghana</span>
                 </div>
              </div>

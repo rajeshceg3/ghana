@@ -128,6 +128,7 @@ export default function MapComponent({
       className: "custom-marker",
       html: `
         <div id="marker-${id}"
+             tabindex="-1"
              class="marker-container"
              style="
           width: 44px;
