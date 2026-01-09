@@ -62,7 +62,8 @@ export default function MapComponent({
     // Fix for Leaflet's default icon path issues in webpack/Next.js
     // We safely access the prototype by casting to 'any' because strict types
     // don't include internal private methods like _getIconUrl.
-    const iconDefaultPrototype = L.Icon.Default.prototype as unknown as { _getIconUrl?: string }
+    type IconDefaultPrototype = L.Icon.Default & { _getIconUrl?: string };
+    const iconDefaultPrototype = L.Icon.Default.prototype as unknown as IconDefaultPrototype;
     if (iconDefaultPrototype._getIconUrl) {
       delete iconDefaultPrototype._getIconUrl
     }
@@ -128,7 +129,9 @@ export default function MapComponent({
       className: "custom-marker",
       html: `
         <div id="marker-${id}"
-             tabindex="-1"
+             tabindex="0"
+             role="button"
+             aria-label="View details for ${safeTitle}"
              class="marker-container"
              style="
           width: 44px;
