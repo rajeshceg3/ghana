@@ -11,6 +11,7 @@ import {
   DialogDescription,
   DialogClose
 } from "@/components/ui/dialog"
+import { toast } from "sonner"
 
 interface AttractionDetailsProps {
   attraction: Attraction
@@ -18,6 +19,28 @@ interface AttractionDetailsProps {
 }
 
 export function AttractionDetails({ attraction, onClose }: AttractionDetailsProps) {
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: attraction.name,
+          text: `Check out ${attraction.name} in Ghana!`,
+          url: window.location.href,
+        })
+      } catch (error) {
+        console.error("Error sharing:", error)
+      }
+    } else {
+      navigator.clipboard.writeText(window.location.href)
+      toast.success("Link copied to clipboard!")
+    }
+  }
+
+  const handleDirections = () => {
+    const url = `https://www.google.com/maps/search/?api=1&query=${attraction.lat},${attraction.lng}`
+    window.open(url, '_blank', 'noopener,noreferrer')
+  }
+
   return (
     <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="p-0 overflow-hidden sm:max-w-[700px] border-0 shadow-2xl bg-background/95 backdrop-blur-xl rounded-2xl gap-0 ring-1 ring-black/5">
@@ -71,7 +94,7 @@ export function AttractionDetails({ attraction, onClose }: AttractionDetailsProp
                 <div className="w-1 h-1 bg-white/60 rounded-full" />
                 <div className="flex items-center gap-2">
                    <MapPin className="w-4 h-4 text-white/90" />
-                   <span>Accra, Ghana</span>
+                   <span>{attraction.location}</span>
                 </div>
              </div>
           </div>
@@ -112,11 +135,20 @@ export function AttractionDetails({ attraction, onClose }: AttractionDetailsProp
                     <h3 className="text-sm font-semibold text-foreground mb-1">Plan your visit</h3>
                     <p className="text-xs text-muted-foreground mb-4">Get the best route or share with friends.</p>
 
-                    <Button size="lg" className="w-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/25 font-semibold transition-all hover:-translate-y-0.5">
+                    <Button
+                      size="lg"
+                      className="w-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/25 font-semibold transition-all hover:-translate-y-0.5"
+                      onClick={handleDirections}
+                    >
                         Get Directions
                         <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
-                    <Button size="lg" variant="outline" className="w-full border-input hover:bg-background hover:text-foreground font-medium transition-all">
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="w-full border-input hover:bg-background hover:text-foreground font-medium transition-all"
+                      onClick={handleShare}
+                    >
                         <Share2 className="w-4 h-4 mr-2" />
                         Share Location
                     </Button>
