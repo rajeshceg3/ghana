@@ -24,10 +24,10 @@ export function AttractionList({
         {attractions.map((attraction, index) => (
           <div
             key={attraction.id}
+            className="animate-fade-in-up opacity-0"
             style={{
               animationDelay: `${index * 30}ms`,
-              opacity: 0,
-              animation: 'fadeInUp 0.5s ease-out forwards'
+              animationFillMode: 'forwards'
             }}
           >
             <AttractionCard
@@ -52,7 +52,7 @@ export function AttractionList({
           </div>
         )}
       </div>
-      <style jsx>{`
+      <style jsx global>{`
         @keyframes fadeInUp {
           from {
             opacity: 0;
@@ -61,6 +61,16 @@ export function AttractionList({
           to {
             opacity: 1;
             transform: translateY(0);
+          }
+        }
+        .animate-fade-in-up {
+          animation: fadeInUp 0.5s ease-out;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .animate-fade-in-up {
+            animation: none;
+            opacity: 1 !important;
+            transform: none;
           }
         }
       `}</style>

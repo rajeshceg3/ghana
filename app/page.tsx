@@ -58,7 +58,8 @@ export default function Page() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+      // Check for K key regardless of case or keyboard layout variants where possible
+      if ((e.key === "k" || e.key === "K" || e.code === "KeyK") && (e.metaKey || e.ctrlKey)) {
         e.preventDefault()
         searchInputRef.current?.focus()
       }
