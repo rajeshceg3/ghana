@@ -117,7 +117,7 @@ export default function MapComponent({
         }
       }
     }
-  })
+  }, [attractions, hoveredAttractionId, selectedAttraction])
 
   // Global keydown listener for map accessibility
   useEffect(() => {
