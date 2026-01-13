@@ -15,9 +15,10 @@ interface MapComponentProps {
   onLeave?: () => void
 }
 
-function MapController({ selectedAttraction }: { selectedAttraction: Attraction | null }) {
+function MapController({ selectedAttraction, attractions }: { selectedAttraction: Attraction | null, attractions: Attraction[] }) {
   const map = useMap()
 
+  // Fly to selected attraction
   useEffect(() => {
     if (selectedAttraction) {
       map.flyTo([selectedAttraction.lat, selectedAttraction.lng], 13, {
@@ -26,6 +27,16 @@ function MapController({ selectedAttraction }: { selectedAttraction: Attraction 
       })
     }
   }, [selectedAttraction, map])
+
+  // Fit bounds when attractions list changes (e.g. search)
+  useEffect(() => {
+    if (!selectedAttraction && attractions.length > 0) {
+      const bounds = L.latLngBounds(attractions.map(a => [a.lat, a.lng]))
+      if (bounds.isValid()) {
+        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 13, animate: true, duration: 1 })
+      }
+    }
+  }, [attractions, map, selectedAttraction])
 
   return null
 }
@@ -108,6 +119,26 @@ export default function MapComponent({
     }
   })
 
+  // Global keydown listener for map accessibility
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.key === 'Enter' || e.key === ' ') && document.activeElement) {
+        const target = document.activeElement as HTMLElement;
+        if (target.id && target.id.startsWith('marker-')) {
+          e.preventDefault(); // Prevent scroll/default
+          const id = parseInt(target.id.replace('marker-', ''), 10);
+          const attraction = attractions.find(a => a.id === id);
+          if (attraction) {
+            onAttractionSelect(attraction);
+          }
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [attractions, onAttractionSelect]);
+
   // Memoize icon creation to avoid unnecessary recreations
   const getCustomIcon = useCallback((isHovered: boolean, isSelected: boolean, title: string, id: number) => {
     // Escape the title to prevent XSS when injecting into HTML string
@@ -180,7 +211,7 @@ export default function MapComponent({
 
         <ZoomControl position="bottomright" />
 
-        <MapController selectedAttraction={selectedAttraction} />
+        <MapController selectedAttraction={selectedAttraction} attractions={attractions} />
         <MapResizer />
 
         {attractions.map((attraction) => {
@@ -196,14 +227,6 @@ export default function MapComponent({
                 click: () => onAttractionSelect(attraction),
                 mouseover: () => onHover?.(attraction.id),
                 mouseout: () => onLeave?.(),
-                keydown: (e) => {
-                  const event = e.originalEvent as KeyboardEvent
-                   if (event.key === 'Enter' || event.key === ' ') {
-                     // Prevent default to avoid map panning
-                     event.preventDefault()
-                     onAttractionSelect(attraction)
-                   }
-                }
               }}
             >
               <Tooltip
