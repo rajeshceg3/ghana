@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, useEffect, useRef } from "react"
+import { useState, useMemo, useEffect, useRef, useCallback } from "react"
 import dynamic from "next/dynamic"
 import { Input } from "@/components/ui/input"
 import { MapPin, Search, Menu, X, ArrowRight } from "lucide-react"
@@ -39,22 +39,22 @@ export default function Page() {
   // Debounce logic for hover to prevent flickering
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  const handleHover = (id: number) => {
+  const handleHover = useCallback((id: number) => {
     if (hoverTimeoutRef.current) {
       clearTimeout(hoverTimeoutRef.current)
       hoverTimeoutRef.current = null
     }
     setHoveredAttractionId(id)
-  }
+  }, [])
 
-  const handleLeave = (id?: number) => {
+  const handleLeave = useCallback((id?: number) => {
     if (hoverTimeoutRef.current) {
       clearTimeout(hoverTimeoutRef.current)
     }
     hoverTimeoutRef.current = setTimeout(() => {
       setHoveredAttractionId(null)
     }, 50)
-  }
+  }, [])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -77,10 +77,10 @@ export default function Page() {
     )
   }, [searchQuery])
 
-  const handleAttractionSelect = (attraction: Attraction) => {
+  const handleAttractionSelect = useCallback((attraction: Attraction) => {
     setSelectedAttraction(attraction)
     setIsMobileMenuOpen(false)
-  }
+  }, [])
 
   return (
     <div className="h-screen w-full bg-background overflow-hidden flex flex-col font-sans selection:bg-primary/20 selection:text-primary">

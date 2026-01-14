@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Star, Clock, MapPin, X, ArrowRight, Share2, Info } from "lucide-react"
@@ -19,6 +20,12 @@ interface AttractionDetailsProps {
 }
 
 export function AttractionDetails({ attraction, onClose }: AttractionDetailsProps) {
+  const [imageError, setImageError] = useState(false)
+
+  useEffect(() => {
+    setImageError(false)
+  }, [attraction])
+
   const handleShare = async () => {
     if (navigator.share) {
       try {
@@ -52,12 +59,13 @@ export function AttractionDetails({ attraction, onClose }: AttractionDetailsProp
         {/* Hero Section */}
         <div className="relative w-full h-[320px] bg-muted group">
           <Image
-            src={attraction.image || "/placeholder.svg"}
+            src={imageError ? "/placeholder.svg" : (attraction.image || "/placeholder.svg")}
             alt={attraction.name}
             fill
             className="object-cover transition-transform duration-1000 group-hover:scale-105"
             priority
             sizes="(max-width: 768px) 100vw, 700px"
+            onError={() => setImageError(true)}
           />
           {/* Enhanced Gradient for text readability */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
