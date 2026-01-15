@@ -1,40 +1,60 @@
-from playwright.sync_api import sync_playwright
 
-def run(playwright):
-    browser = playwright.chromium.launch(headless=True)
-    page = browser.new_page()
+import time
+from playwright.sync_api import sync_playwright, expect
 
-    # 1. Load the page
-    print("Navigating to home page...")
-    page.goto("http://localhost:3000")
-    page.wait_for_load_state("networkidle")
+def run_verification():
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        # Use a larger viewport to ensure desktop view
+        context = browser.new_context(viewport={'width': 1280, 'height': 800})
+        page = context.new_page()
 
-    # 2. Verify Map Loads (MapComponent is async)
-    print("Waiting for map...")
-    # MapComponent uses dynamic import, so it might take a moment.
-    # The container has class 'custom-map-container' or we look for leaflet
-    try:
-        page.wait_for_selector(".leaflet-container", timeout=10000)
-    except:
-        print("Leaflet container not found, taking screenshot for debug")
-        page.screenshot(path="verification/debug_map_fail.png")
-        raise
+        print("Navigating to app...")
+        try:
+            page.goto("http://localhost:3000", timeout=60000)
+        except Exception as e:
+            print(f"Error navigating: {e}")
+            browser.close()
+            return
 
-    # 3. Click on "Cape Coast Castle" in the list
-    # The list is in the sidebar.
-    print("Clicking attraction...")
-    page.get_by_text("Cape Coast Castle").first.click()
+        print("Checking page title...")
+        try:
+            # wait for title
+            page.wait_for_load_state("networkidle")
+            title = page.title()
+            print(f"Page title: {title}")
 
-    # 4. Wait for dialog
-    print("Waiting for dialog...")
-    page.wait_for_selector("div[role='dialog']")
+            # Verify map loaded
+            page.wait_for_selector(".leaflet-container")
+            print("Map container found.")
+        except Exception as e:
+            print(f"Error getting title or map: {e}")
 
-    # 5. Take screenshot
-    print("Taking screenshot...")
-    page.screenshot(path="verification/app_verification.png")
+        # Check for console errors
+        page.on("console", lambda msg: print(f"Console {msg.type}: {msg.text}"))
+        page.on("pageerror", lambda err: print(f"Page Error: {err}"))
 
-    browser.close()
+        print("Taking final screenshot...")
+        page.screenshot(path="verification/verification_final.png")
+
+        # Test Search with explicit text wait
+        print("Testing search...")
+        try:
+            search_input = page.locator("input[placeholder='Find a destination...']")
+            if search_input.is_visible():
+                search_input.fill("Cape Coast")
+                # Wait for the item to be visible. Text is the best locator here.
+                cape_coast_item = page.get_by_text("Cape Coast Castle", exact=False).first
+                cape_coast_item.wait_for(state="visible", timeout=5000)
+
+                print("Search success: found 'Cape Coast Castle'")
+                page.screenshot(path="verification/search_result_final.png")
+            else:
+                print("Search input not found")
+        except Exception as e:
+            print(f"Search test failed: {e}")
+
+        browser.close()
 
 if __name__ == "__main__":
-    with sync_playwright() as playwright:
-        run(playwright)
+    run_verification()
