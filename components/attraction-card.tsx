@@ -1,4 +1,7 @@
+"use client"
+
 import { Card, CardContent } from "@/components/ui/card"
+import { useState, useEffect } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Star, Clock, ChevronRight, MapPin } from "lucide-react"
 import Image from "next/image"
@@ -21,6 +24,13 @@ export function AttractionCard({
   onMouseEnter,
   onMouseLeave,
 }: AttractionCardProps) {
+  const [imageError, setImageError] = useState(false)
+
+  // Reset error state if attraction changes (though keys usually handle this)
+  useEffect(() => {
+    setImageError(false)
+  }, [attraction.image])
+
   return (
     <div
       className={`group relative isolate rounded-xl transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)]
@@ -47,11 +57,12 @@ export function AttractionCard({
         {/* Image Container - Slightly larger and cleaner */}
         <div className="w-24 h-24 rounded-lg overflow-hidden relative shrink-0 bg-muted shadow-inner">
           <Image
-            src={attraction.image || "/placeholder.svg"}
+            src={imageError ? "/placeholder.svg" : (attraction.image || "/placeholder.svg")}
             alt={attraction.name}
             fill
             className={`object-cover transition-transform duration-700 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${isHovered || isSelected ? 'scale-110' : 'scale-100'}`}
             sizes="(max-width: 768px) 100px, 100px"
+            onError={() => setImageError(true)}
           />
           <div className="absolute inset-0 ring-1 ring-black/5 rounded-lg z-10" />
         </div>

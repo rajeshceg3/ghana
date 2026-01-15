@@ -180,10 +180,13 @@ export default function Page() {
 
       <main className="flex flex-1 overflow-hidden relative">
         {/* Desktop Sidebar - Premium List View */}
-        <aside className="hidden md:flex w-[420px] bg-sidebar border-r border-sidebar-border flex-col z-10 h-full shadow-[4px_0_24px_-4px_rgba(0,0,0,0.02)]">
+        <aside
+          className="hidden md:flex w-[420px] bg-sidebar border-r border-sidebar-border flex-col z-10 h-full shadow-[4px_0_24px_-4px_rgba(0,0,0,0.02)]"
+          aria-label="Featured Places"
+        >
           <div className="p-6 pb-4 flex-shrink-0 bg-sidebar/50 backdrop-blur-sm z-10 sticky top-0">
              <div className="flex items-center justify-between mb-2">
-               <h2 className="text-lg font-bold text-sidebar-foreground tracking-tight">Featured Places</h2>
+               <h2 id="sidebar-heading" className="text-lg font-bold text-sidebar-foreground tracking-tight">Featured Places</h2>
                <Badge variant="outline" className="bg-sidebar-accent/50 text-sidebar-primary border-sidebar-primary/20 px-2.5 py-0.5 rounded-full shadow-none font-semibold text-xs">
                  {filteredAttractions.length} Results
                </Badge>
@@ -194,7 +197,11 @@ export default function Page() {
           </div>
 
           <div className="flex-1 overflow-hidden relative">
-            <div className="absolute inset-0 overflow-y-auto hover:scrollbar-thumb-muted-foreground/30">
+            <div
+              className="absolute inset-0 overflow-y-auto hover:scrollbar-thumb-muted-foreground/30"
+              role="region"
+              aria-labelledby="sidebar-heading"
+            >
                 <div className="p-2 pb-20"> {/* Padding bottom for scroll space */}
                     <AttractionList
                         attractions={filteredAttractions}
