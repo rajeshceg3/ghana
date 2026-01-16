@@ -110,6 +110,11 @@ export default function Page() {
                 placeholder="Find a destination..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && filteredAttractions.length > 0) {
+                    handleAttractionSelect(filteredAttractions[0])
+                  }
+                }}
                 className="pl-10 pr-12 w-full bg-muted/30 border-transparent hover:bg-muted/50 focus:bg-white focus:border-primary/20 focus:ring-4 focus:ring-primary/5 rounded-full transition-all duration-300 h-11 shadow-sm font-medium text-sm placeholder:text-muted-foreground/60"
                 aria-label="Search attractions"
               />
@@ -143,6 +148,11 @@ export default function Page() {
                   placeholder="Search..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && filteredAttractions.length > 0) {
+                      handleAttractionSelect(filteredAttractions[0])
+                    }
+                  }}
                   className="pl-9 h-10 bg-muted/50 border-transparent rounded-full text-sm focus:bg-background focus:ring-2 focus:ring-primary/20 shadow-none font-medium"
                   aria-label="Search attractions mobile"
                 />

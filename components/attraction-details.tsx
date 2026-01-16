@@ -74,7 +74,7 @@ export function AttractionDetails({ attraction, onClose }: AttractionDetailsProp
           <Button
             variant="ghost"
             size="icon"
-            className="absolute top-4 right-4 bg-black/40 hover:bg-black/60 text-white rounded-full backdrop-blur-md z-20 border border-white/20 transition-all duration-300 hover:scale-105"
+            className="absolute top-4 right-4 bg-black/40 hover:bg-black/60 text-white rounded-full backdrop-blur-md z-20 border border-white/20 transition-all duration-300 hover:scale-105 focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none"
             onClick={onClose}
             aria-label="Close details"
           >
