@@ -18,6 +18,8 @@ export function AttractionList({
   onHover,
   onLeave,
 }: AttractionListProps) {
+  if (!attractions) return null
+
   return (
     <div className="flex flex-col h-full bg-transparent">
       <div className="flex-1 space-y-3 px-3 py-2">
@@ -34,9 +36,9 @@ export function AttractionList({
               attraction={attraction}
               isSelected={selectedAttractionId === attraction.id}
               isHovered={hoveredAttractionId === attraction.id}
-              onClick={() => onSelect(attraction)}
-              onMouseEnter={() => onHover(attraction.id)}
-              onMouseLeave={() => onLeave(attraction.id)}
+              onClick={onSelect}
+              onMouseEnter={onHover}
+              onMouseLeave={onLeave}
             />
           </div>
         ))}

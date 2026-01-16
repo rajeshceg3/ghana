@@ -1,7 +1,7 @@
 "use client"
 
 import { Card, CardContent } from "@/components/ui/card"
-import { useState, useEffect } from "react"
+import { useState, useEffect, memo } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Star, Clock, ChevronRight, MapPin } from "lucide-react"
 import Image from "next/image"
@@ -16,7 +16,7 @@ interface AttractionCardProps {
   onMouseLeave: (id: number) => void
 }
 
-export function AttractionCard({
+export const AttractionCard = memo(function AttractionCard({
   attraction,
   isSelected,
   isHovered,
@@ -114,4 +114,4 @@ export function AttractionCard({
       </div>
     </div>
   )
-}
+})
