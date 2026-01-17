@@ -1,9 +1,8 @@
 "use client"
 
-import { Card, CardContent } from "@/components/ui/card"
 import { useState, useEffect, memo } from "react"
 import { Badge } from "@/components/ui/badge"
-import { Star, Clock, ChevronRight, MapPin } from "lucide-react"
+import { Star, Clock, ChevronRight } from "lucide-react"
 import Image from "next/image"
 import { Attraction, categoryColors } from "@/lib/data"
 
@@ -32,8 +31,9 @@ export const AttractionCard = memo(function AttractionCard({
   }, [attraction.image])
 
   return (
-    <div
-      className={`group relative isolate rounded-xl transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)]
+    <button
+      type="button"
+      className={`group relative isolate rounded-xl transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] w-full text-left
         ${isSelected
           ? "bg-white ring-1 ring-primary/20 shadow-[0_8px_30px_rgb(0,0,0,0.12)] z-10 scale-[1.02]"
           : "bg-white hover:bg-white hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:scale-[1.01] hover:z-10"
@@ -43,15 +43,7 @@ export const AttractionCard = memo(function AttractionCard({
       onClick={() => onClick(attraction)}
       onMouseEnter={() => onMouseEnter(attraction.id)}
       onMouseLeave={() => onMouseLeave(attraction.id)}
-      role="button"
       aria-pressed={isSelected}
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault() // Prevent scrolling when pressing Space
-          onClick(attraction)
-        }
-      }}
     >
       <div className="p-3 flex gap-4">
         {/* Image Container - Slightly larger and cleaner */}
@@ -112,6 +104,6 @@ export const AttractionCard = memo(function AttractionCard({
           </div>
         </div>
       </div>
-    </div>
+    </button>
   )
 })
