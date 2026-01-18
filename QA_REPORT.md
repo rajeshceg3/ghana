@@ -6,43 +6,39 @@
 
 ## Executive Summary
 
-A full-spectrum diagnostic operation was conducted on the "Ghana Explore" web application. The application demonstrates a high level of code quality and modern architectural patterns (Next.js 16, React 19). Several operational weaknesses were identified, primarily in performance optimization (unnecessary re-renders) and potential image loading robustness. These have been neutralized.
+A deep-dive analysis of the "Ghana Explore" application has been completed. The application is well-structured but exhibits specific weaknesses in rendering performance, accessibility compliance, and code standards. The following report details these findings and the remediation plan.
 
 ## Findings Registry
 
-### 1. Performance & React Render Optimization (Severity: MEDIUM - RESOLVED)
-*   **Issue**: `handleAttractionSelect`, `handleHover`, and `handleLeave` functions in `app/page.tsx` were not memoized.
-*   **Impact**: This caused `MapComponent` and every `Marker` within it to re-render on every state change in the parent component (e.g., typing in the search box), even if the map data hadn't changed. This degraded performance and caused excessive DOM updates.
-*   **Action**: Wrapped these handlers in `useCallback` to ensure referential stability.
-*   **Status**: **FIXED**
+### 1. Performance: Map Marker Re-rendering (Severity: MEDIUM)
+*   **Observation**: The `MapComponent` creates a new `L.divIcon` object for every marker on every render cycle (hover, selection, filtering).
+*   **Impact**: This forces React Leaflet to treat every icon as "new", triggering DOM updates for all markers even if their state (hover/select) hasn't changed. This causes unnecessary layout thrashing and painting, especially on lower-end devices.
+*   **Recommendation**: Extract a `MapMarker` component and memoize the icon creation logic to ensure referential stability.
 
-### 2. Robustness & Error Handling (Severity: LOW/MEDIUM - RESOLVED)
-*   **Issue**: `AttractionDetails` lacked explicit error handling for image loading.
-*   **Impact**: If an image asset failed to load (404 or network error), the user would see a broken image icon, degrading the premium feel of the application.
-*   **Action**: Implemented a local state-based fallback mechanism. If `onError` is triggered, the image source automatically swaps to `/placeholder.svg`.
-*   **Status**: **FIXED**
+### 2. Architecture: Font Loading Strategy (Severity: LOW)
+*   **Observation**: `app/layout.tsx` injects CSS variables for fonts using a `<style>` tag inside `<head>`.
+*   **Impact**: While functional, this deviates from Next.js 13+ best practices. It can lead to hydration mismatches or Flash of Unstyled Text (FOUT) in edge cases.
+*   **Recommendation**: Apply font variable classes directly to the `<body>` element.
 
-### 3. Map Component Focus Restoration (Severity: LOW - VERIFIED)
-*   **Observation**: The `MapComponent` contains logic to restore focus to markers after re-renders.
-*   **Analysis**: The logic correctly uses a ref (`lastFocusedMarkerId`) and a `useEffect` with proper dependencies (`attractions`, `hoveredAttractionId`, `selectedAttraction`).
-*   **Status**: **VERIFIED OPTIMAL**
+### 3. Accessibility: Map Focus Management (Severity: LOW - MONITOR)
+*   **Observation**: Focus management relies on imperative `document.getElementById` lookups.
+*   **Impact**: Robust, but coupled to DOM IDs.
+*   **Recommendation**: Monitor for regressions. Current implementation is functional.
 
-### 4. Accessibility (Severity: LOW - CLEARED)
-*   **Observation**: Automated checks might flag Leaflet tiles as missing alt text.
-*   **Analysis**: These are decorative/presentation map tiles. `AttractionDetails` images have proper `alt` attributes derived from attraction names.
-*   **Status**: **COMPLIANT**
+### 4. User Experience: Selection Persistence (Severity: LOW)
+*   **Observation**: Searching/filtering does not clear the currently selected attraction.
+*   **Impact**: If a user selects an item, then filters it out, the map marker disappears but the details modal remains.
+*   **Recommendation**: Accepted behavior for now (allows keeping details open while searching).
 
-### 5. Security (Severity: LOW - CLEARED)
-*   **Observation**: `MapComponent` injects HTML for custom markers.
-*   **Analysis**: Title strings are manually sanitized (replacing `&`, `"`, `'`, `<`, `>`) before injection. Given the data source is currently static (`lib/data.ts`), this is sufficient.
-*   **Status**: **SECURE**
+## Remediation Plan
 
-## Operational Plan Execution
+1.  **Refactor Map Markers**: Implement `components/map-marker.tsx` with `useMemo` for icons.
+2.  **Standardize Layout**: Update `app/layout.tsx` to use `className` for font variables.
+3.  **Verification**: Execute build and lint checks.
 
-1.  **Optimization**: `app/page.tsx` handlers memoized with `useCallback`.
-2.  **Hardening**: `AttractionDetails` image handling fortified with fallback logic.
-3.  **Verification**: Codebase built and linted successfully.
+**Mission Status**: GREEN. Proceeding with fixes.
 
-## Conclusion
-
-The "Ghana Explore" application has been hardened against performance bottlenecks and minor UX failures. The applied fixes ensure a smooth, high-frame-rate experience even during rapid user interactions, and robustly handle asset failures. The system is now classified as **"Elite"** status, ready for deployment.
+### 5. Robustness: Image Loading (Severity: MEDIUM - RESOLVED)
+*   **Observation**: Server logs indicated failures in image optimization (likely due to missing 'sharp' or environment constraints).
+*   **Impact**: Potential broken images or server log noise.
+*   **Action**: Enabled 'unoptimized: true' in 'next.config.mjs' to serve images directly from public directory, ensuring reliability.

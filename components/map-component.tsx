@@ -1,10 +1,11 @@
 "use client"
 
-import { useEffect, useCallback, useMemo, useRef } from "react"
-import { MapContainer, TileLayer, Marker, useMap, ZoomControl, Tooltip } from "react-leaflet"
+import { useEffect, useRef } from "react"
+import { MapContainer, TileLayer, useMap, ZoomControl } from "react-leaflet"
 import L from "leaflet"
 import "leaflet/dist/leaflet.css"
 import { Attraction } from "@/lib/data"
+import { MapMarker } from "./map-marker"
 
 interface MapComponentProps {
   attractions: Attraction[]
@@ -139,60 +140,6 @@ export default function MapComponent({
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [attractions, onAttractionSelect]);
 
-  // Memoize icon creation to avoid unnecessary recreations
-  const getCustomIcon = useCallback((isHovered: boolean, isSelected: boolean, title: string, id: number) => {
-    // Escape the title to prevent XSS when injecting into HTML string
-    const safeTitle = title
-      .replace(/&/g, '&amp;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
-
-    // Colors derived from our primary "Indigo/Blue" or "Orange" logic
-    // We decided on Primary = Indigo (Stripe-ish) but markers are locations,
-    // often red or orange. Let's make them primary color (Indigo) for consistency.
-    // Or maybe keep them Orange/Warm for contrast against the map.
-    // Let's go with a very clean Indigo to match the new UI.
-    const color = isSelected ? '#4338ca' : (isHovered ? '#6366f1' : '#4f46e5'); // Indigo 700, 500, 600
-
-    return L.divIcon({
-      className: "custom-marker",
-      html: `
-        <div id="marker-${id}"
-             tabindex="0"
-             role="button"
-             aria-label="View details for ${safeTitle}"
-             class="marker-container focus:outline-none focus:ring-4 focus:ring-primary/40 focus:ring-offset-2"
-             style="
-          width: 44px;
-          height: 44px;
-          background: ${color};
-          border: 4px solid white;
-          border-radius: 50% 50% 50% 0;
-          box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-          cursor: pointer;
-          transform: rotate(-45deg) ${isHovered || isSelected ? 'scale(1.1) translateY(-5px)' : 'scale(1)'};
-        ">
-           <div style="
-             width: 14px;
-             height: 14px;
-             background: white;
-             border-radius: 50%;
-             transform: rotate(45deg);
-           "></div>
-        </div>
-      `,
-      iconSize: [44, 44],
-      iconAnchor: [22, 44], // Pointing tip at location
-      popupAnchor: [0, -44]
-    })
-  }, [])
-
   return (
     <>
       <MapContainer
@@ -218,26 +165,15 @@ export default function MapComponent({
            const isSelected = selectedAttraction?.id === attraction.id
            const isHovered = hoveredAttractionId === attraction.id
            return (
-            <Marker
-              key={attraction.id}
-              position={[attraction.lat, attraction.lng]}
-              icon={getCustomIcon(isHovered, isSelected, attraction.name, attraction.id)}
-              title={attraction.name}
-              eventHandlers={{
-                click: () => onAttractionSelect(attraction),
-                mouseover: () => onHover?.(attraction.id),
-                mouseout: () => onLeave?.(),
-              }}
-            >
-              <Tooltip
-                direction="top"
-                offset={[0, -44]}
-                opacity={1}
-                className="font-sans font-medium text-sm shadow-md border-none px-3 py-1.5 rounded-md text-foreground"
-              >
-                {attraction.name}
-              </Tooltip>
-            </Marker>
+             <MapMarker
+                key={attraction.id}
+                attraction={attraction}
+                isSelected={isSelected}
+                isHovered={isHovered}
+                onSelect={onAttractionSelect}
+                onHover={onHover}
+                onLeave={onLeave}
+             />
           )
         })}
       </MapContainer>
