@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo } from "react"
+import { useMemo, memo } from "react"
 import { Marker, Tooltip } from "react-leaflet"
 import L from "leaflet"
 import { Attraction } from "@/lib/data"
@@ -14,7 +14,7 @@ interface MapMarkerProps {
   onLeave?: () => void
 }
 
-export function MapMarker({
+export const MapMarker = memo(function MapMarker({
   attraction,
   isSelected,
   isHovered,
@@ -45,6 +45,7 @@ export function MapMarker({
              tabindex="0"
              role="button"
              aria-label="View details for ${safeTitle}"
+             aria-pressed="${isSelected}"
              class="marker-container focus:outline-none focus:ring-4 focus:ring-primary/40 focus:ring-offset-2"
              style="
           width: 44px;
@@ -96,4 +97,4 @@ export function MapMarker({
       </Tooltip>
     </Marker>
   )
-}
+})
