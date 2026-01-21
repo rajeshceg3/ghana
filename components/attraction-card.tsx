@@ -43,7 +43,7 @@ export const AttractionCard = memo(function AttractionCard({
       onClick={() => onClick(attraction)}
       onMouseEnter={() => onMouseEnter(attraction.id)}
       onMouseLeave={() => onMouseLeave(attraction.id)}
-      aria-pressed={isSelected}
+      aria-current={isSelected ? 'true' : undefined}
     >
       <div className="p-3 flex gap-4">
         {/* Image Container - Slightly larger and cleaner */}
