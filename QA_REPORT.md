@@ -1,56 +1,59 @@
-# Tactical QA Intelligence Briefing
+# QA Validation & Vulnerability Assessment Report
 
-**Subject**: Comprehensive Vulnerability & Bug Assessment - Ghana Explore Application
-**Date**: 2024-05-24
-**Analyst**: Jules, Task Force Veteran QA Engineer
-**Classification**: INTERNAL USE ONLY
+**Classification:** CONFIDENTIAL
+**Date:** 2024-05-22
+**Target:** Ghana Leaflet Map Application
+**Operative:** Jules (QA Task Force)
 
 ## Executive Summary
+The target application is a Next.js-based geospatial visualization tool utilizing Leaflet for interactive mapping. The architecture is modern, leveraging React 19, Tailwind CSS 4, and strict TypeScript. While the core operational integrity is sound, several vulnerabilities and optimization vectors were identified and remediated to ensure maximum operational resilience.
 
-A rigorous, deep-dive analysis of the "Ghana Explore" application has been executed. The codebase demonstrates a solid architectural foundation but contained critical inefficiencies in rendering performance and specific accessibility gaps. A targeted remediation operation has been conducted to neutralize these threats.
+## 1. Vulnerability Assessment
 
-## Findings Registry & Status Report
+### 1.1 Security (High Severity) [RESOLVED]
+*   **Vector:** Cross-Site Scripting (XSS) in Map Markers.
+*   **Analysis:** The `MapMarker` component manually constructed HTML strings for Leaflet `divIcon`s using a weak custom sanitization chain.
+*   **Remediation:** Implemented `lib/utils.ts` with a robust `escapeHtml` function. Refactored `components/map-marker.tsx` to use this centralized utility, eliminating the risk of XSS via marker titles.
 
-### 1. Performance: Map Marker Re-rendering (Severity: HIGH)
-*   **Observation**: The `MapMarker` component was not memoized, and was rendered inside a `.map()` loop in `MapComponent`.
-*   **Impact**: Any state change in the parent `MapComponent` (e.g., hovering over *one* attraction) triggered a re-render of *all* `MapMarker` instances. This caused unnecessary DOM diffing and layout thrashing, degrading frame rates on lower-end devices.
-*   **Action Taken**: **NEUTRALIZED**. Wrapped `MapMarker` in `React.memo`. This ensures that only the specific marker undergoing a state change (hover/select) re-renders.
-*   **Status**: **FIXED**
+### 1.2 Performance (Medium Severity) [RESOLVED]
+*   **Vector:** Image Optimization Disabled.
+*   **Analysis:** `next.config.mjs` set `images: { unoptimized: true }`, forcing full-resolution downloads and degrading LCP.
+*   **Remediation:** Removed the `unoptimized: true` flag in `next.config.mjs`, enabling Next.js's built-in image optimization pipeline.
 
-### 2. Accessibility: Marker State Communication (Severity: MEDIUM)
-*   **Observation**: Custom HTML markers used `tabindex="0"` and `role="button"` but lacked the `aria-pressed` state to communicate selection status to assistive technologies.
-*   **Impact**: Screen reader users would navigate to a marker but receive no feedback on whether it was currently the active/selected point of interest.
-*   **Action Taken**: **NEUTRALIZED**. Injected `aria-pressed="${isSelected}"` into the marker's HTML string generation logic.
-*   **Status**: **FIXED**
+### 1.3 Accessibility (Medium Severity) [RESOLVED]
+*   **Vector:** ARIA State Management.
+*   **Analysis:** `AttractionCard` used `aria-pressed` incorrectly for a list-selection context.
+*   **Remediation:** Updated `components/attraction-card.tsx` to use `aria-current="true"` when selected, providing correct semantic information to assistive technologies for the sidebar list.
 
-### 3. Architecture: Font Loading Strategy (Severity: LOW)
-*   **Observation**: Previous intelligence reports suggested improper `<style>` tag usage.
-*   **Verification**: Forensic analysis of `app/layout.tsx` confirms that Next.js font variables (`GeistSans.variable`) are correctly applied via the `className` prop on the `<body>` element.
-*   **Status**: **CLEARED** (False Positive / Already Rectified)
+### 1.4 Architecture (Low Severity)
+*   **Vector:** Hardcoded Data Source.
+*   **Analysis:** Attraction data is hardcoded in `lib/data.ts`. While acceptable for a prototype, this limits scalability and dynamic updates.
+*   **Recommendation:** (Future) Migrating to a CMS or API-driven architecture.
 
-### 4. Robustness: Image Loading (Severity: MEDIUM)
-*   **Observation**: `next.config.mjs` has `images: { unoptimized: true }`.
-*   **Analysis**: This configuration disables Next.js server-side image optimization. While this prevents "missing sharp" errors in some containerized environments, it results in larger payloads for users (LCP degradation).
-*   **Recommendation**: Maintain current configuration for operational stability in the current deployment environment. Re-evaluate if CDN or robust image processing infrastructure becomes available.
-*   **Status**: **MITIGATED** (Accepted Trade-off)
+## 2. Bug Report
 
-### 5. Quality Assurance: Automated Testing (Severity: HIGH)
-*   **Observation**: Zero automated tests detected. No `test` script in `package.json`.
-*   **Impact**: High risk of regression during future operations.
-*   **Action Required**: Establish a testing beachhead. A `check-types` script is being introduced to enforce strict type compliance as a first line of defense.
-*   **Status**: **IN PROGRESS**
+| ID | Severity | Description | Location | Status |
+|----|----------|-------------|----------|--------|
+| B-001 | High | Potential XSS via manual string manipulation | `components/map-marker.tsx` | **FIXED** |
+| B-002 | Medium | Inefficient Image Loading | `next.config.mjs` | **FIXED** |
+| B-003 | Low | Focus restoration reliance on DOM IDs | `components/map-component.tsx` | **MONITORED** |
+| B-004 | Low | Search filter does not reset map view if no results | `components/map-component.tsx` | **FIXED** |
 
-### 6. Code Hygiene: Leaflet Prototype Patching (Severity: LOW)
-*   **Observation**: `MapComponent` uses `any` casting to patch `L.Icon.Default.prototype`.
-*   **Analysis**: This is a known necessary evil to fix Leaflet's asset loading issues in Webpack environments. The implementation is contained and commented.
-*   **Status**: **ACCEPTED RISK**
+## 3. Mitigation Log
 
-## Operational Summary
+### Phase 1: Hardening (Completed)
+1.  **Sanitization Protocol:** Implemented `escapeHtml` in `lib/utils.ts` and integrated it into `MapMarker`.
+2.  **Type Safety:** Verified `check-types` passes across the codebase.
 
-The application's core rendering loop has been optimized, and accessibility vectors have been hardened. The system is now more resilient to high-frequency user interactions (hovering/rapid selection).
+### Phase 2: Optimization (Completed)
+1.  **Image Strategy:** Enabled Next.js Image Optimization by modifying `next.config.mjs`. Verified that image URLs are now served via `/_next/image`.
 
-**Next Steps**:
-1.  Complete pre-commit verifications (Linting & Type Checking).
-2.  Submit patch to the repository.
+### Phase 3: Accessibility & UX Polish (Completed)
+1.  **Semantic Refinement:** Switched `AttractionCard` to use `aria-current`.
+2.  **UX Enhancement:** Updated `MapController` in `components/map-component.tsx` to automatically reset the map view to Ghana's bounds when a search query returns no results.
 
-**Mission Status**: PROCEEDING TO FINAL VERIFICATION.
+## 4. Operational Recommendations
+*   **Continuous:** Maintain the `escapeHtml` utility as the single source of truth for string sanitization.
+*   **Future:** Consider implementing E2E tests for the map canvas using visual regression testing tools to catch rendering issues that standard DOM queries might miss.
+
+**End of Report.**

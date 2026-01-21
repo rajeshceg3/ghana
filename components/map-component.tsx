@@ -31,10 +31,15 @@ function MapController({ selectedAttraction, attractions }: { selectedAttraction
 
   // Fit bounds when attractions list changes (e.g. search)
   useEffect(() => {
-    if (!selectedAttraction && attractions.length > 0) {
-      const bounds = L.latLngBounds(attractions.map(a => [a.lat, a.lng]))
-      if (bounds.isValid()) {
-        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 13, animate: true, duration: 1 })
+    if (!selectedAttraction) {
+      if (attractions.length > 0) {
+        const bounds = L.latLngBounds(attractions.map(a => [a.lat, a.lng]))
+        if (bounds.isValid()) {
+          map.fitBounds(bounds, { padding: [50, 50], maxZoom: 13, animate: true, duration: 1 })
+        }
+      } else {
+        // Reset to default Ghana view if no results
+        map.flyTo([7.9465, -1.0232], 7, { animate: true, duration: 1 })
       }
     }
   }, [attractions, map, selectedAttraction])

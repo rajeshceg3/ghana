@@ -4,6 +4,7 @@ import { useMemo, memo } from "react"
 import { Marker, Tooltip } from "react-leaflet"
 import L from "leaflet"
 import { Attraction } from "@/lib/data"
+import { escapeHtml } from "@/lib/utils"
 
 interface MapMarkerProps {
   attraction: Attraction
@@ -28,12 +29,7 @@ export const MapMarker = memo(function MapMarker({
     const id = attraction.id;
 
     // Escape the title to prevent XSS when injecting into HTML string
-    const safeTitle = title
-      .replace(/&/g, '&amp;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
+    const safeTitle = escapeHtml(title)
 
     // Colors derived from our primary "Indigo/Blue"
     const color = isSelected ? '#4338ca' : (isHovered ? '#6366f1' : '#4f46e5'); // Indigo 700, 500, 600
