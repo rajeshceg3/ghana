@@ -77,6 +77,7 @@ export const MapMarker = memo(function MapMarker({
       position={[attraction.lat, attraction.lng]}
       icon={icon}
       title={attraction.name}
+      keyboard={false} // Disable Leaflet's default keyboard handling on wrapper to avoid double tab stops
       eventHandlers={{
         click: () => onSelect(attraction),
         mouseover: () => onHover?.(attraction.id),
