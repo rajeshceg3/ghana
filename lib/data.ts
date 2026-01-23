@@ -37,7 +37,7 @@ export const attractions: Attraction[] = [
     lng: -1.3833,
     location: "Cape Coast, Central Region",
     description: "Experience the rainforest canopy on suspended walkways 40 meters above the ground.",
-    image: "/placeholder-zq13n.png",
+    image: "/placeholder.svg",
     highlights: ["Canopy walkway", "Rainforest", "Wildlife viewing"],
   },
   {
@@ -63,7 +63,7 @@ export const attractions: Attraction[] = [
     lng: 0.6,
     location: "Wli, Volta Region",
     description: "The highest waterfall in Ghana, cascading from a height of approximately 60 meters.",
-    image: "/placeholder-zn15g.png",
+    image: "/placeholder.svg",
     highlights: ["Highest waterfall", "Hiking trail", "Swimming opportunity"],
   },
   {

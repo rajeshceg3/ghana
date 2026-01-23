@@ -125,6 +125,12 @@ export default function MapComponent({
     }
   }, [attractions, hoveredAttractionId, selectedAttraction])
 
+  // Keep a ref to attractions to avoid re-binding event listeners on every search keystroke
+  const attractionsRef = useRef(attractions)
+  useEffect(() => {
+    attractionsRef.current = attractions
+  }, [attractions])
+
   // Global keydown listener for map accessibility
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -133,7 +139,7 @@ export default function MapComponent({
         if (target.id && target.id.startsWith('marker-')) {
           e.preventDefault(); // Prevent scroll/default
           const id = parseInt(target.id.replace('marker-', ''), 10);
-          const attraction = attractions.find(a => a.id === id);
+          const attraction = attractionsRef.current.find(a => a.id === id);
           if (attraction) {
             onAttractionSelect(attraction);
           }
@@ -143,7 +149,7 @@ export default function MapComponent({
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [attractions, onAttractionSelect]);
+  }, [onAttractionSelect]);
 
   return (
     <>
