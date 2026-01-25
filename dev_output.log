@@ -1,5 +1,5 @@
 
-> my-v0-project@0.1.0 dev /app
+> my-v0-project@0.1.0 dev
 > next dev
 
 ▲ Next.js 16.1.1 (Turbopack)
@@ -12,8 +12,6 @@ This information is used to shape Next.js' roadmap and prioritize features.
 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
 https://nextjs.org/telemetry
 
-✓ Ready in 2.3s
+✓ Ready in 680ms
 ○ Compiling / ...
- GET / 200 in 8.4s (compile: 7.7s, render: 634ms)
- GET / 200 in 155ms (compile: 11ms, render: 144ms)
- GET / 200 in 350ms (compile: 68ms, render: 282ms)
+ GET / 200 in 5.6s (compile: 4.9s, render: 675ms)
