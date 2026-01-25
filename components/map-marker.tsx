@@ -42,7 +42,7 @@ export const MapMarker = memo(function MapMarker({
              role="button"
              aria-label="View details for ${safeTitle}"
              aria-pressed="${isSelected}"
-             class="marker-container focus:outline-none focus:ring-4 focus:ring-primary/40 focus:ring-offset-2"
+             class="marker-container marker-focus"
              style="
           width: 44px;
           height: 44px;

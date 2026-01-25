@@ -34,7 +34,7 @@ export const AttractionList = memo(function AttractionList({
           </p>
         </div>
       ) : (
-        <ul className="flex-1 space-y-3 px-3 py-2 list-none m-0">
+        <ul className="flex-1 space-y-3 px-3 py-2 list-none m-0" aria-label="List of attractions">
           {attractions.map((attraction, index) => (
             <li
               key={attraction.id}
