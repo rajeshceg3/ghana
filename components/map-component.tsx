@@ -115,13 +115,15 @@ export default function MapComponent({
   // Restore focus after render if necessary
   useEffect(() => {
     if (lastFocusedMarkerId.current !== null) {
-      const element = document.getElementById(`marker-${lastFocusedMarkerId.current}`)
-      if (element && document.activeElement !== element) {
-        // Only attempt focus if the element is connected to DOM
-        if (element.isConnected) {
+      requestAnimationFrame(() => {
+        const element = document.getElementById(`marker-${lastFocusedMarkerId.current}`)
+        if (element && document.activeElement !== element) {
+          // Only attempt focus if the element is connected to DOM
+          if (element.isConnected) {
             element.focus()
+          }
         }
-      }
+      })
     }
   }, [attractions, hoveredAttractionId, selectedAttraction])
 

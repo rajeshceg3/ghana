@@ -50,7 +50,7 @@ export function AttractionDetails({ attraction, onClose }: AttractionDetailsProp
 
   return (
     <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="p-0 overflow-hidden sm:max-w-[700px] border-0 shadow-2xl bg-background/95 backdrop-blur-xl rounded-2xl gap-0 ring-1 ring-black/5">
+      <DialogContent showCloseButton={false} className="p-0 overflow-hidden sm:max-w-[700px] border-0 shadow-2xl bg-background/95 backdrop-blur-xl rounded-2xl gap-0 ring-1 ring-black/5">
         <DialogHeader className="sr-only">
           <DialogTitle>{attraction.name}</DialogTitle>
           <DialogDescription>Details about {attraction.name}</DialogDescription>
