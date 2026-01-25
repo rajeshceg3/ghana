@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Star, Clock, MapPin, X, ArrowRight, Share2, Info } from "lucide-react"
+import { Star, Clock, MapPin, X, ArrowRight, Share2, Info, Wallet, Calendar, Lightbulb, Tag } from "lucide-react"
 import Image from "next/image"
 import { Attraction, categoryColors } from "@/lib/data"
 import {
@@ -50,117 +50,190 @@ export function AttractionDetails({ attraction, onClose }: AttractionDetailsProp
 
   return (
     <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent showCloseButton={false} className="p-0 overflow-hidden sm:max-w-[700px] border-0 shadow-2xl bg-background/95 backdrop-blur-xl rounded-2xl gap-0 ring-1 ring-black/5">
+      <DialogContent showCloseButton={false} className="p-0 overflow-hidden sm:max-w-[800px] border-0 shadow-2xl bg-background/95 backdrop-blur-xl rounded-2xl gap-0 ring-1 ring-black/5 max-h-[90vh] flex flex-col">
         <DialogHeader className="sr-only">
           <DialogTitle>{attraction.name}</DialogTitle>
           <DialogDescription>Details about {attraction.name}</DialogDescription>
         </DialogHeader>
 
-        {/* Hero Section */}
-        <div className="relative w-full h-[320px] bg-muted group">
-          <Image
-            src={imageError ? "/placeholder.svg" : (attraction.image || "/placeholder.svg")}
-            alt={attraction.name}
-            fill
-            className="object-cover transition-transform duration-1000 group-hover:scale-105"
-            priority
-            sizes="(max-width: 768px) 100vw, 700px"
-            onError={() => setImageError(true)}
-          />
-          {/* Enhanced Gradient for text readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+        {/* Scrollable Container */}
+        <div className="overflow-y-auto flex-1 custom-scrollbar">
+          {/* Hero Section */}
+          <div className="relative w-full h-[360px] bg-muted group shrink-0">
+            <Image
+              src={imageError ? "/placeholder.svg" : (attraction.image || "/placeholder.svg")}
+              alt={attraction.name}
+              fill
+              className="object-cover transition-transform duration-1000 group-hover:scale-105"
+              priority
+              sizes="(max-width: 768px) 100vw, 800px"
+              onError={() => setImageError(true)}
+            />
+            {/* Enhanced Gradient for text readability */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
 
-          {/* Floating Close Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute top-4 right-4 bg-black/40 hover:bg-black/60 text-white rounded-full backdrop-blur-md z-20 border border-white/20 transition-all duration-300 hover:scale-105 focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none"
-            onClick={onClose}
-            aria-label="Close details"
-          >
-            <X className="w-5 h-5" />
-          </Button>
+            {/* Floating Close Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-4 right-4 bg-black/40 hover:bg-black/60 text-white rounded-full backdrop-blur-md z-20 border border-white/20 transition-all duration-300 hover:scale-105 focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none"
+              onClick={onClose}
+              aria-label="Close details"
+            >
+              <X className="w-5 h-5" />
+            </Button>
 
-          <div className="absolute bottom-0 left-0 p-8 w-full z-10 text-white">
-             <div className="flex items-center gap-3 mb-3">
-                <Badge className={`border-0 backdrop-blur-md shadow-sm font-semibold px-3 py-1 text-xs tracking-wide uppercase ${categoryColors[attraction.category] || "bg-white/90 text-black"}`}>
-                    {attraction.category}
-                </Badge>
-                <div className="flex items-center gap-1.5 bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10">
-                  <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                  <span className="text-xs font-semibold">{attraction.rating}</span>
-                </div>
-             </div>
+            <div className="absolute bottom-0 left-0 p-8 w-full z-10 text-white">
+               <div className="flex items-center gap-3 mb-3">
+                  <Badge className={`border-0 backdrop-blur-md shadow-sm font-semibold px-3 py-1 text-xs tracking-wide uppercase ${categoryColors[attraction.category] || "bg-white/90 text-black"}`}>
+                      {attraction.category}
+                  </Badge>
+                  <div className="flex items-center gap-1.5 bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10">
+                    <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                    <span className="text-xs font-semibold">{attraction.rating}</span>
+                  </div>
+               </div>
 
-             <h2 className="text-4xl sm:text-5xl font-bold tracking-tight mb-2 text-white drop-shadow-md">{attraction.name}</h2>
+               <h2 className="text-4xl sm:text-5xl font-bold tracking-tight mb-2 text-white drop-shadow-md">{attraction.name}</h2>
 
-             <div className="flex items-center gap-4 text-white font-medium text-sm mt-4">
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-white/90" />
-                  <span>{attraction.duration}</span>
-                </div>
-                <div className="w-1 h-1 bg-white/60 rounded-full" />
-                <div className="flex items-center gap-2">
-                   <MapPin className="w-4 h-4 text-white/90" />
-                   <span>{attraction.location}</span>
-                </div>
-             </div>
+               <div className="flex items-center gap-4 text-white font-medium text-sm mt-4">
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-white/90" />
+                    <span>{attraction.duration}</span>
+                  </div>
+                  <div className="w-1 h-1 bg-white/60 rounded-full" />
+                  <div className="flex items-center gap-2">
+                     <MapPin className="w-4 h-4 text-white/90" />
+                     <span>{attraction.location}</span>
+                  </div>
+               </div>
+            </div>
           </div>
-        </div>
 
-        {/* Content Section */}
-        <div className="p-8 bg-background relative z-10">
-          <div className="flex flex-col gap-8">
-            <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-8">
-                <div className="space-y-6">
-                    <div className="prose prose-slate max-w-none">
-                        <h3 className="text-sm font-semibold text-primary uppercase tracking-wider mb-2 flex items-center gap-2">
-                            <Info className="w-4 h-4" /> About
-                        </h3>
-                        <p className="text-lg text-muted-foreground leading-relaxed font-normal">
-                          {attraction.description}
-                        </p>
-                    </div>
+          {/* Content Section */}
+          <div className="p-8 bg-background relative z-10">
+            <div className="flex flex-col gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-8">
+                  <div className="space-y-8">
+                      {/* About */}
+                      <div className="prose prose-slate max-w-none">
+                          <h3 className="text-sm font-semibold text-primary uppercase tracking-wider mb-3 flex items-center gap-2">
+                              <Info className="w-4 h-4" /> About
+                          </h3>
+                          <p className="text-lg text-muted-foreground leading-relaxed font-normal">
+                            {attraction.description}
+                          </p>
+                      </div>
 
-                    <div>
-                        <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-3">Highlights</h3>
-                        <div className="flex flex-wrap gap-2">
-                          {attraction.highlights.map((highlight) => (
-                            <Badge
-                              key={highlight}
-                              variant="secondary"
-                              className="px-3 py-1.5 bg-muted/50 text-foreground hover:bg-muted border border-border/50 text-sm font-medium transition-colors"
-                            >
-                              {highlight}
-                            </Badge>
-                          ))}
+                      {/* Highlights */}
+                      <div>
+                          <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
+                            <Star className="w-4 h-4 text-primary" /> Highlights
+                          </h3>
+                          <div className="flex flex-wrap gap-2">
+                            {attraction.highlights.map((highlight) => (
+                              <Badge
+                                key={highlight}
+                                variant="secondary"
+                                className="px-3 py-1.5 bg-muted/50 text-foreground hover:bg-muted border border-border/50 text-sm font-medium transition-colors"
+                              >
+                                {highlight}
+                              </Badge>
+                            ))}
+                          </div>
+                      </div>
+
+                      {/* Traveler Tips */}
+                      {attraction.tips && attraction.tips.length > 0 && (
+                        <div>
+                          <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
+                            <Lightbulb className="w-4 h-4 text-amber-500" /> Traveler Tips
+                          </h3>
+                          <ul className="space-y-2">
+                            {attraction.tips.map((tip, idx) => (
+                              <li key={idx} className="flex items-start gap-3 text-sm text-muted-foreground">
+                                <div className="w-1.5 h-1.5 rounded-full bg-primary/40 mt-1.5 shrink-0" />
+                                <span>{tip}</span>
+                              </li>
+                            ))}
+                          </ul>
                         </div>
-                    </div>
-                </div>
+                      )}
 
-                {/* Actions Panel */}
-                <div className="flex flex-col gap-3 p-6 bg-muted/30 rounded-xl border border-border/50 h-fit">
-                    <h3 className="text-sm font-semibold text-foreground mb-1">Plan your visit</h3>
-                    <p className="text-xs text-muted-foreground mb-4">Get the best route or share with friends.</p>
+                      {/* Tags */}
+                      {attraction.tags && attraction.tags.length > 0 && (
+                        <div>
+                           <div className="flex flex-wrap gap-2 pt-4 border-t border-border/40">
+                              {attraction.tags.map(tag => (
+                                <div key={tag} className="flex items-center gap-1 text-xs text-muted-foreground bg-muted/30 px-2 py-1 rounded-md">
+                                   <Tag className="w-3 h-3" />
+                                   {tag}
+                                </div>
+                              ))}
+                           </div>
+                        </div>
+                      )}
+                  </div>
 
-                    <Button
-                      size="lg"
-                      className="w-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/25 font-semibold transition-all hover:-translate-y-0.5"
-                      onClick={handleDirections}
-                    >
-                        Get Directions
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                    </Button>
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      className="w-full border-input hover:bg-background hover:text-foreground font-medium transition-all"
-                      onClick={handleShare}
-                    >
-                        <Share2 className="w-4 h-4 mr-2" />
-                        Share Location
-                    </Button>
-                </div>
+                  {/* Right Column - Plan your visit */}
+                  <div className="space-y-6">
+                      <div className="flex flex-col gap-4 p-6 bg-muted/30 rounded-xl border border-border/50 h-fit sticky top-4">
+                          <h3 className="text-sm font-semibold text-foreground mb-1">Visitor Information</h3>
+
+                          <div className="space-y-4">
+                             {attraction.openingHours && (
+                               <div className="flex items-start gap-3">
+                                  <Clock className="w-4 h-4 text-muted-foreground mt-0.5" />
+                                  <div className="text-sm">
+                                    <p className="font-medium text-foreground">Opening Hours</p>
+                                    <p className="text-muted-foreground text-xs">{attraction.openingHours}</p>
+                                  </div>
+                               </div>
+                             )}
+
+                             {attraction.entryFee && (
+                               <div className="flex items-start gap-3">
+                                  <Wallet className="w-4 h-4 text-muted-foreground mt-0.5" />
+                                  <div className="text-sm">
+                                    <p className="font-medium text-foreground">Entry Fee</p>
+                                    <p className="text-muted-foreground text-xs">{attraction.entryFee}</p>
+                                  </div>
+                               </div>
+                             )}
+
+                             {attraction.bestTime && (
+                               <div className="flex items-start gap-3">
+                                  <Calendar className="w-4 h-4 text-muted-foreground mt-0.5" />
+                                  <div className="text-sm">
+                                    <p className="font-medium text-foreground">Best Time to Visit</p>
+                                    <p className="text-muted-foreground text-xs">{attraction.bestTime}</p>
+                                  </div>
+                               </div>
+                             )}
+                          </div>
+
+                          <div className="w-full h-px bg-border/50 my-1" />
+
+                          <Button
+                            size="lg"
+                            className="w-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/25 font-semibold transition-all hover:-translate-y-0.5"
+                            onClick={handleDirections}
+                          >
+                              Get Directions
+                              <ArrowRight className="w-4 h-4 ml-2" />
+                          </Button>
+                          <Button
+                            size="lg"
+                            variant="outline"
+                            className="w-full border-input hover:bg-background hover:text-foreground font-medium transition-all"
+                            onClick={handleShare}
+                          >
+                              <Share2 className="w-4 h-4 mr-2" />
+                              Share Location
+                          </Button>
+                      </div>
+                  </div>
+              </div>
             </div>
           </div>
         </div>
