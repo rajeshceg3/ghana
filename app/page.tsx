@@ -153,9 +153,18 @@ export default function Page() {
                       handleAttractionSelect(filteredAttractions[0])
                     }
                   }}
-                  className="pl-9 h-10 bg-muted/50 border-transparent rounded-full text-sm focus:bg-background focus:ring-2 focus:ring-primary/20 shadow-none font-medium"
+                  className="pl-9 h-10 bg-muted/50 border-transparent rounded-full text-sm focus:bg-background focus:ring-2 focus:ring-primary/20 shadow-none font-medium pr-8"
                   aria-label="Search attractions mobile"
                 />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-0.5 rounded-full hover:bg-muted"
+                    aria-label="Clear search"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
               </div>
 
               <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
