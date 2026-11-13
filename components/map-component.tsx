@@ -1,11 +1,29 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import { MapContainer, TileLayer, useMap, ZoomControl } from "react-leaflet"
+import { MapContainer, useMap, ZoomControl } from "react-leaflet"
 import L from "leaflet"
 import "leaflet/dist/leaflet.css"
+import { maplibreGL } from "@maplibre/maplibre-gl-leaflet"
+import "maplibre-gl/dist/maplibre-gl.css"
+import warmMapStyle from "@/vendor/warm-map/style.json"
 import { Attraction } from "@/lib/data"
 import { MapMarker } from "./map-marker"
+
+// Warm paper basemap (worlds shared module): OpenFreeMap vector tiles,
+// custom watercolor-wash style. Free public instance, no API key.
+function WarmPaperBasemap() {
+  const map = useMap()
+  useEffect(() => {
+    const layer = maplibreGL({ style: warmMapStyle as any })
+    layer.addTo(map)
+    map.attributionControl.addAttribution('<a href="https://openfreemap.org" target="_blank">OpenFreeMap</a> <a href="https://www.openmaptiles.org/" target="_blank">&copy; OpenMapTiles</a> Data from <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>')
+    return () => {
+      map.removeLayer(layer)
+    }
+  }, [map])
+  return null
+}
 
 interface MapComponentProps {
   attractions: Attraction[]
@@ -158,16 +176,12 @@ export default function MapComponent({
       <MapContainer
         center={[7.9465, -1.0232]}
         zoom={7}
+        maxZoom={18}
         zoomControl={false}
         className="w-full h-full custom-map-container"
         aria-label="Map of Ghana Attractions"
       >
-        <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-          subdomains="abcd"
-          maxZoom={19}
-        />
+        <WarmPaperBasemap />
 
         <ZoomControl position="bottomright" />
 
