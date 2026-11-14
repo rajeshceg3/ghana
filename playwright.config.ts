@@ -1,0 +1,2 @@
+import {defineConfig} from '@playwright/test';
+export default defineConfig({testDir:'./tests',workers:1,retries:process.env.CI?1:0,reporter:'list',use:{baseURL:process.env.BASE_URL||'http://127.0.0.1:4173',launchOptions:{...(process.env.CHROME_PATH?{executablePath:process.env.CHROME_PATH}:{}),args:['--enable-unsafe-swiftshader']}},webServer:process.env.BASE_URL?undefined:{command:'pnpm serve:export',url:'http://127.0.0.1:4173',reuseExistingServer:false}})

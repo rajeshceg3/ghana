@@ -36,3 +36,7 @@ next-env.d.ts
 # server logs
 server.log
 dev_server.log
+
+/public/maplibre-gl-worker.mjs
+/test-results/
+/playwright-report/

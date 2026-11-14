@@ -38,11 +38,7 @@ export const AttractionList = memo(function AttractionList({
           {attractions.map((attraction, index) => (
             <li
               key={attraction.id}
-              className="animate-fade-in-up opacity-0"
-              style={{
-                animationDelay: `${index * 30}ms`,
-                animationFillMode: 'forwards'
-              }}
+
             >
               <AttractionCard
                 attraction={attraction}
