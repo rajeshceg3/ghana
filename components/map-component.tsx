@@ -1,8 +1,9 @@
 "use client"
 
-import { useEffect, useRef } from "react"
-import { MapContainer, useMap, ZoomControl } from "react-leaflet"
+import { useEffect, useRef, useState } from "react"
+import { MapContainer, useMap, useMapEvents, Marker } from "react-leaflet"
 import L from "leaflet"
+import * as maplibregl from "maplibre-gl"
 import "leaflet/dist/leaflet.css"
 import { maplibreGL } from "@maplibre/maplibre-gl-leaflet"
 import "maplibre-gl/dist/maplibre-gl.css"
@@ -12,11 +13,15 @@ import { MapMarker } from "./map-marker"
 
 // Warm paper basemap (worlds shared module): OpenFreeMap vector tiles,
 // custom watercolor-wash style. Free public instance, no API key.
+maplibregl.setWorkerUrl("/maplibre-gl-worker.mjs")
+
 function WarmPaperBasemap() {
   const map = useMap()
   useEffect(() => {
     const layer = maplibreGL({ style: warmMapStyle as any })
     layer.addTo(map)
+    const element = map.getContainer() as HTMLElement & {_warmMap?: unknown}
+    element._warmMap = layer.getMaplibreMap()
     map.attributionControl.addAttribution('<a href="https://openfreemap.org" target="_blank">OpenFreeMap</a> <a href="https://www.openmaptiles.org/" target="_blank">&copy; OpenMapTiles</a> Data from <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>')
     return () => {
       map.removeLayer(layer)
@@ -32,16 +37,19 @@ interface MapComponentProps {
   onAttractionSelect: (attraction: Attraction) => void
   onHover?: (id: number) => void
   onLeave?: () => void
+  command: {kind:string,id:number}
 }
 
-function MapController({ selectedAttraction, attractions }: { selectedAttraction: Attraction | null, attractions: Attraction[] }) {
+function MapController({ selectedAttraction, attractions, command }: { selectedAttraction: Attraction | null, attractions: Attraction[], command:{kind:string,id:number} }) {
   const map = useMap()
 
-  // Fly to selected attraction
+  useEffect(()=>{if(command.kind==="in")map.zoomIn(undefined,{animate:false});if(command.kind==="out")map.zoomOut(undefined,{animate:false});if(command.kind==="reset"){const b=L.latLngBounds(attractions.map(a=>[a.lat,a.lng]));if(b.isValid())map.fitBounds(b,{padding:[36,36],maxZoom:13,animate:false})}},[command,map,attractions])
+
+  // Select without camera animation
   useEffect(() => {
     if (selectedAttraction) {
       map.flyTo([selectedAttraction.lat, selectedAttraction.lng], 13, {
-        animate: true,
+        animate: false,
         duration: 1.5,
       })
     }
@@ -53,11 +61,11 @@ function MapController({ selectedAttraction, attractions }: { selectedAttraction
       if (attractions.length > 0) {
         const bounds = L.latLngBounds(attractions.map(a => [a.lat, a.lng]))
         if (bounds.isValid()) {
-          map.fitBounds(bounds, { padding: [50, 50], maxZoom: 13, animate: true, duration: 1 })
+          map.fitBounds(bounds, { padding: [50, 50], maxZoom: 13, animate: false, duration: 1 })
         }
       } else {
         // Reset to default Ghana view if no results
-        map.flyTo([7.9465, -1.0232], 7, { animate: true, duration: 1 })
+        map.flyTo([7.9465, -1.0232], 7, { animate: false, duration: 1 })
       }
     }
   }, [attractions, map, selectedAttraction])
@@ -91,6 +99,7 @@ export default function MapComponent({
   onAttractionSelect,
   onHover,
   onLeave,
+  command,
 }: MapComponentProps) {
 
   useEffect(() => {
@@ -183,27 +192,29 @@ export default function MapComponent({
       >
         <WarmPaperBasemap />
 
-        <ZoomControl position="bottomright" />
-
-        <MapController selectedAttraction={selectedAttraction} attractions={attractions} />
+        <MapController selectedAttraction={selectedAttraction} attractions={attractions} command={command} />
         <MapResizer />
 
-        {attractions.map((attraction) => {
-           const isSelected = selectedAttraction?.id === attraction.id
-           const isHovered = hoveredAttractionId === attraction.id
-           return (
-             <MapMarker
-                key={attraction.id}
-                attraction={attraction}
-                isSelected={isSelected}
-                isHovered={isHovered}
-                onSelect={onAttractionSelect}
-                onHover={onHover}
-                onLeave={onLeave}
-             />
-          )
-        })}
+        <ClusteredPlaces attractions={attractions} selectedAttraction={selectedAttraction} hoveredAttractionId={hoveredAttractionId} onAttractionSelect={onAttractionSelect} onHover={onHover} onLeave={onLeave} />
       </MapContainer>
     </>
   )
+}
+
+function ClusteredPlaces({attractions,selectedAttraction,hoveredAttractionId,onAttractionSelect,onHover,onLeave}:Omit<MapComponentProps,"command">) {
+ const [,setRevision]=useState(0)
+ const map=useMapEvents({zoomend:()=>setRevision(v=>v+1),moveend:()=>setRevision(v=>v+1)})
+ const groups:Attraction[][]=[]
+ for(const attraction of attractions){
+   const p=map.latLngToContainerPoint([attraction.lat,attraction.lng])
+   const group=groups.find(g=>g[0].id!==selectedAttraction?.id&&attraction.id!==selectedAttraction?.id&&map.latLngToContainerPoint([g[0].lat,g[0].lng]).distanceTo(p)<48)
+   if(group)group.push(attraction);else groups.push([attraction])
+ }
+ return <>{groups.map(group=>group.length===1 ? <MapMarker key={group[0].id} attraction={group[0]} isSelected={selectedAttraction?.id===group[0].id} isHovered={hoveredAttractionId===group[0].id} onSelect={onAttractionSelect} onHover={onHover} onLeave={onLeave}/> : <ClusterMarker key={group.map(a=>a.id).join("-")} group={group}/>)}</>
+}
+function ClusterMarker({group}:{group:Attraction[]}) {
+ const map=useMap()
+ const center=L.latLngBounds(group.map(a=>[a.lat,a.lng])).getCenter()
+ const icon=L.divIcon({className:"place-cluster",html:`<button type="button" aria-label="Explore ${group.length} nearby places">${group.length}</button>`,iconSize:[44,44],iconAnchor:[22,22]})
+ return <Marker position={center} icon={icon} keyboard={false} eventHandlers={{click:()=>map.fitBounds(L.latLngBounds(group.map(a=>[a.lat,a.lng])),{padding:[60,60],maxZoom:16,animate:false})}}/>
 }

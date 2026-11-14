@@ -46,28 +46,28 @@ export const MapMarker = memo(function MapMarker({
              style="
           width: 44px;
           height: 44px;
-          background: ${color};
-          border: 4px solid white;
-          border-radius: 50% 50% 50% 0;
-          box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+          background: transparent;
+          border: 0 solid white;
+          border-radius: 50%;
+          box-shadow: none;
           display: flex;
           align-items: center;
           justify-content: center;
           transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
           cursor: pointer;
-          transform: rotate(-45deg) ${isHovered || isSelected ? 'scale(1.1) translateY(-5px)' : 'scale(1)'};
+          transform: none;
         ">
            <div style="
-             width: 14px;
-             height: 14px;
-             background: white;
+             width: ${isSelected ? 24 : 14}px;
+             height: ${isSelected ? 24 : 14}px;
+             background: ${color}; border: 2px solid white; box-shadow: 0 1px 4px #0005;
              border-radius: 50%;
              transform: rotate(45deg);
            "></div>
         </div>
       `,
       iconSize: [44, 44],
-      iconAnchor: [22, 44], // Pointing tip at location
+      iconAnchor: [22, 22], // Pointing tip at location
       popupAnchor: [0, -44]
     })
   }, [attraction.name, attraction.id, isSelected, isHovered])

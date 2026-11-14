@@ -50,7 +50,7 @@ export function AttractionDetails({ attraction, onClose }: AttractionDetailsProp
 
   return (
     <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent showCloseButton={false} className="p-0 overflow-hidden sm:max-w-[800px] border-0 shadow-2xl bg-background/95 backdrop-blur-xl rounded-2xl gap-0 ring-1 ring-black/5 max-h-[90vh] flex flex-col">
+      <DialogContent showCloseButton={false} className="ghana-detail p-0 overflow-hidden sm:max-w-[800px] border-0 shadow-2xl bg-background/95 backdrop-blur-xl rounded-2xl gap-0 ring-1 ring-black/5 max-h-[90vh] flex flex-col">
         <DialogHeader className="sr-only">
           <DialogTitle>{attraction.name}</DialogTitle>
           <DialogDescription>Details about {attraction.name}</DialogDescription>
@@ -59,7 +59,7 @@ export function AttractionDetails({ attraction, onClose }: AttractionDetailsProp
         {/* Scrollable Container */}
         <div className="overflow-y-auto flex-1 custom-scrollbar">
           {/* Hero Section */}
-          <div className="relative w-full h-[360px] bg-muted group shrink-0">
+          <div className="detail-hero relative w-full h-[240px] bg-muted group shrink-0">
             <Image
               src={imageError ? "/placeholder.svg" : (attraction.image || "/placeholder.svg")}
               alt={attraction.name}
@@ -76,14 +76,14 @@ export function AttractionDetails({ attraction, onClose }: AttractionDetailsProp
             <Button
               variant="ghost"
               size="icon"
-              className="absolute top-4 right-4 bg-black/40 hover:bg-black/60 text-white rounded-full backdrop-blur-md z-20 border border-white/20 transition-all duration-300 hover:scale-105 focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none"
+              className="fixed top-3 right-3 h-11 w-11 bg-black/40 hover:bg-black/60 text-white rounded-full backdrop-blur-md z-20 border border-white/20 transition-all duration-300 hover:scale-105 focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none"
               onClick={onClose}
               aria-label="Close details"
             >
               <X className="w-5 h-5" />
             </Button>
 
-            <div className="absolute bottom-0 left-0 p-8 w-full z-10 text-white">
+            <div className="absolute bottom-0 left-0 p-5 w-full z-10 text-white">
                <div className="flex items-center gap-3 mb-3">
                   <Badge className={`border-0 backdrop-blur-md shadow-sm font-semibold px-3 py-1 text-xs tracking-wide uppercase ${categoryColors[attraction.category] || "bg-white/90 text-black"}`}>
                       {attraction.category}
@@ -94,9 +94,9 @@ export function AttractionDetails({ attraction, onClose }: AttractionDetailsProp
                   </div>
                </div>
 
-               <h2 className="text-4xl sm:text-5xl font-bold tracking-tight mb-2 text-white drop-shadow-md">{attraction.name}</h2>
+               <h2 className="text-2xl sm:text-4xl font-bold tracking-tight mb-2 text-white drop-shadow-md">{attraction.name}</h2>
 
-               <div className="flex items-center gap-4 text-white font-medium text-sm mt-4">
+               <div className="flex flex-wrap items-center gap-3 text-white font-medium text-sm mt-4">
                   <div className="flex items-center gap-2">
                     <Clock className="w-4 h-4 text-white/90" />
                     <span>{attraction.duration}</span>
@@ -111,7 +111,7 @@ export function AttractionDetails({ attraction, onClose }: AttractionDetailsProp
           </div>
 
           {/* Content Section */}
-          <div className="p-8 bg-background relative z-10">
+          <div className="p-5 bg-background relative z-10">
             <div className="flex flex-col gap-8">
               <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-8">
                   <div className="space-y-8">
@@ -120,7 +120,7 @@ export function AttractionDetails({ attraction, onClose }: AttractionDetailsProp
                           <h3 className="text-sm font-semibold text-primary uppercase tracking-wider mb-3 flex items-center gap-2">
                               <Info className="w-4 h-4" /> About
                           </h3>
-                          <p className="text-lg text-muted-foreground leading-relaxed font-normal">
+                          <p className="text-base text-muted-foreground leading-relaxed font-normal">
                             {attraction.description}
                           </p>
                       </div>
